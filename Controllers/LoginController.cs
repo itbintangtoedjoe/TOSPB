@@ -45,6 +45,10 @@ namespace WebApplication1.Controllers
             return View();
         }
 
+        public void abc()
+        {
+            string abc = "testing";
+        }
 
         [HttpPost]
         public async Task<ActionResult> LoginExec(string Username, string Password, string ADFlag)

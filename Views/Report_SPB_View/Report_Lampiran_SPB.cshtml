@@ -1,0 +1,38 @@
+﻿
+@{
+    ViewBag.Title = "Report_Lampiran_SPB";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="container-fluid">
+    <input id="No_Surat" name="nocapa" class="form-control" type="text" value="@ViewBag.No_Surat" hidden />
+    <iframe id="ifrmReportViewer" style="height: 3500px; width: 3500px; " frameborder="0" scrolling="no"></iframe>
+</div>
+<script>
+    $(document).ready(function () {
+        var No_Surat = $("#No_Surat").val();
+        /*            alert(nocapa);*/
+        ReportValidationCheck(No_Surat);
+    });
+    function ReportValidationCheck(No_Surat) {
+
+        url = "../Report_SPB/Report_Lampiran.aspx?No_Surat=" + No_Surat + "";
+
+        var myframe = document.getElementById("ifrmReportViewer");
+        if (myframe !== null) {
+            if (myframe.src) {
+                myframe.src = url;
+            }
+            else if (myframe.contentWindow !== null && myframe.contentWindow.location !== null) {
+                myframe.contentWindow.location = url;
+            }
+            else {
+                myframe.setAttribute('src', url);
+            }
+        }
+        return false;
+    }
+</script>
+
+

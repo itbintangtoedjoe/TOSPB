@@ -1,0 +1,329 @@
+﻿
+@{
+    ViewBag.Title = "CMS_TOApproval";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+    .dataTables_filter {
+        position: relative;
+    }
+
+        .dataTables_filter input {
+            width: 250px;
+            height: 32px;
+            background: #fcfcfc;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            box-shadow: 0 0 3px #ccc, 0 10px 15px #ebebeb inset;
+            text-indent: 10px;
+        }
+
+        .dataTables_filter .fa-search {
+            position: absolute;
+            top: 10px;
+            left: auto;
+            right: 10px;
+        }
+
+    @@media (min-width: 768px) {
+        .modal-xl {
+            width: 900%;
+            max-width: 1300px;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    @*Table Approval*@
+                    <div class="row form-group-sm mt-3" id="divTable">
+                        <div class="col-md-12">
+                            <h2>TO Approval</h2>
+                            <div id="form_tableSPB" class="form-group row">
+                                <table id="tbl_TO" class="table table-striped table-bordered" style="width: 100%;">
+                                    <thead style="text-align: center">
+                                        <tr>
+                                            <th>No</th>
+                                            <th>No. TO</th>
+                                            <th></th>
+                                            <th>Status</th>
+                                            <th style="text-align: center">View</th>
+                                            <th style="text-align: center">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tBodyTO">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var noTO = '';
+    var lineNumber = '';
+    var status = '';
+    var alasanReject = '';
+    var flagStatus = '';
+    var currentdate = '';
+
+    $(document).ready(function () {
+        getTableData();
+
+        $('#tbl_TO').on('click',
+            'tbody tr .view', function () {
+                var row = $(this).closest("TR");
+                var data = $('#tbl_TO').DataTable().row(row).data();
+                var noTO = data['NoTO'];
+                var status = data['Status'];
+                var lineNumber = data['LineNumber'];
+
+                window.open('../Report_TO_View/Report_TO_Preview?No_TO=' + noTO + '&Status=' + status + '&LineNumber=' + lineNumber);
+            });
+
+        $('#tbl_TO tbody').on('click', 'input[id="btn_Approve"]', function () {
+            var row = $(this).closest("TR");
+            var data = $('#tbl_TO').DataTable().row(row).data();
+            noTO = data['NoTO'];
+            lineNumber = data['LineNumber'];
+            status = data['Status'];
+            flagStatus = 'approve';
+
+            Swal.fire({
+                title: "Warning!",
+                text: "Approve Report?",
+                type: "warning",
+                showConfirmButton: true
+            }).then((result) => {
+                if (result.value) {
+                    currentdate = new Date().toLocaleString('en-GB');
+                    getEmailData();
+                }
+            });
+        });
+
+        $('#tbl_TO tbody').on('click', 'input[id="btn_Reject"]', function () {
+            var row = $(this).closest("TR");
+            var data = $('#tbl_TO').DataTable().row(row).data();
+            noTO = data['NoTO'];
+            lineNumber = data['LineNumber'];
+            status = data['Status'];
+            flagStatus = 'rejected';
+
+            Swal.fire({
+                type: 'warning',
+                title: 'Mohon Masukkan Alasan Reject!',
+                input: 'textarea',
+                inputAttributes: {
+                    autocapitalize: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Submit',
+                showLoaderOnConfirm: true,
+
+                allowOutsideClick: () => Swal.isLoading()
+            }).then((result) => {
+
+                if (result.value == null || result.value == '') {
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: 'Alasan Reject Tidak Boleh Kosong!'
+                    });
+                } else {
+                    alasanReject = result.value;
+                    currentdate = new Date().toLocaleString('en-GB');
+                    getEmailData();
+                }
+            });
+        });
+    });
+
+    function getTableData() {
+        var dictlist = {
+            Option: "Get TO Approval Table",
+            Username: "@Request.RequestContext.HttpContext.Session["UserName"]"
+        }
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var table = $('#tbl_TO').DataTable({
+                    "pageLength": 10,
+                    "data": JSON.parse(data),
+                    "filter": true,
+                    "lengthChange": true,
+                    "paging": true,
+                    "info": true,
+                    "searching": true,
+                    "select": true,
+                    "bDestroy": true,
+                    "scrollCollapse": true,
+                    "columns": [
+                        {  "data": "id",
+                            render: function (data, type, row, meta) {
+                                return meta.row + meta.settings._iDisplayStart + 1;
+                            }
+                        },
+                        { "data": "NoTO" },
+                        {
+                            "data": "LineNumber",
+                            visible: false
+                        },
+                        {
+                            "data": "Status",
+                            visible: false
+                        },
+                        {
+                            "data": null,
+                            "defaultContent": '<input type="button" class="btn btn-primary view" style="background-color: dodgerblue; border-color: dodgerblue; margin-left:auto;margin-right:auto;display:block;" id="btn_View" value="View" />'
+                        },
+                        {
+                            "data": null,
+                            "defaultContent":
+                                '<div style="margin-left:auto; margin-right:auto; display:block;text-align:center;position:relative;">' +
+                                    '<input type="button" class="btn btn-primary approve" style="background-color: #28de7a; border-color: #28de7a;  text-align:center; " id="btn_Approve" value="Approve" />' +
+                                '<input type="button" class="btn btn-primary reject" style="background-color: red; border-color: red; margin-left: 10px;margin-right: 10px; text-align:center" id="btn_Reject" value="Reject" />' +
+                            '</div>'
+                               
+                        }
+                    ],
+
+                    "order": [[0, 'asc']],
+                    "columnDefs": [
+                        { "width": "1%", "targets": 0 },
+                        { "className": "text-center", "targets": 0 },
+                        { "width": "40%", "targets": 1 },
+                        { "width": "5%", "targets": 4 },
+                        { "width": "10%", "targets": 5 }
+                    ]
+                });
+
+            }, error: function (ex) {
+                console.log(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function approveReport() {
+        var dictlist = {
+            Option: "Approve Report TO",
+            NoTO: noTO,
+            LineNumber: lineNumber,
+            Uploader: "@Request.RequestContext.HttpContext.Session["UserName"]"
+        }
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                Swal.fire({
+                    title: "Report Approved!",
+                    type: "success",
+                    showConfirmButton: false,
+                    timer: 3000,
+                });
+                getTableData();
+            }, error: function (ex) {
+                console.log(JSON.stringify(ex));
+            }
+        });
+        }
+
+    function rejectReport() {
+        var dictlist = {
+            Option: "Reject Report TO",
+            NoTO: noTO,
+            LineNumber: lineNumber,
+            AlasanReject: alasanReject,
+            Uploader: "@Request.RequestContext.HttpContext.Session["UserName"]"
+        }
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                Swal.fire({
+                    title: "Report Rejected!",
+                    type: "success",
+                    showConfirmButton: false,
+                    timer: 2500
+                });
+                getTableData();
+            }, error: function (ex) {
+                console.log(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function getEmailData() {
+        if (flagStatus === 'approve') {
+            var dto = {
+                FlagStatus: flagStatus,
+                NoTO: noTO,
+                LineNumber: lineNumber,
+                Uploader: "@Request.RequestContext.HttpContext.Session["UserName"]"
+            }
+            $.ajax({
+                url: "GetEmailDataTO",
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(dto),
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    approveReport();
+                }, error: function (ex) {
+                    console.log(JSON.stringify(ex));
+                }
+            });
+        }
+
+        else if (flagStatus === 'rejected') {
+            var dto = {
+                FlagStatus: flagStatus,
+                NoTO: noTO,
+                LineNumber: lineNumber,
+                AlasanReject: alasanReject,
+                Uploader: "@Request.RequestContext.HttpContext.Session["UserName"]",
+                WaktuReject: currentdate
+            }
+            $.ajax({
+                url: "GetEmailDataTO",
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(dto),
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    rejectReport();
+                }, error: function (ex) {
+                    console.log(JSON.stringify(ex));
+                }
+            });
+        }
+    }
+</script>

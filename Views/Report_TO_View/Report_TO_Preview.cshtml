@@ -1,0 +1,651 @@
+﻿
+@{
+    ViewBag.Title = "Report_TO_Preview";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link rel="stylesheet" href=" https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+<script src="https://kit.fontawesome.com/0507c93dbe.js" crossorigin="anonymous"></script>
+
+<style>
+    #wrap {
+         /*background: #e7e7e7;*/
+        text-align: center;
+         width: 100%;
+     }
+
+    #leftDetail, #rightDetail {
+        /*background: #ccc;*/
+        display: inline-block;
+    }
+    .dataTables_filter {
+        position: relative;
+    }
+    
+    .dataTables_filter input {
+        width: 250px;
+        height: 32px;
+        background: #fcfcfc;
+        border: 1px solid #aaa;
+        border-radius: 5px;
+        box-shadow: 0 0 3px #ccc, 0 10px 15px #ebebeb inset;
+        text-indent: 10px;
+    }
+
+    .dataTables_filter .fa-search {
+        position: absolute;
+        top: 10px;
+        left: auto;
+        right: 10px;
+    }
+
+    @@media (min-width: 768px) {
+        .modal-xl {
+            width: 900%;
+            max-width: 1300px;
+        }
+    }
+
+    .select2-selection__rendered {
+        line-height: 40px !important;
+    }
+
+    .select2-container .select2-selection--single {
+        height: 40px !important;
+    }
+
+    .select2-selection__arrow {
+        height: 40px !important;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-9" style="margin: 0 auto;float: none;margin-bottom: 10px; ">
+            <div class="card">
+                <div class="card-body">
+                    <div id="divNormal">
+                        <div class="col-md-12">
+                            <h2>Report TO Preview</h2>
+                        </div>
+                        <hr class="solid">
+                    </div>
+                    <div id="divReject" hidden>
+                        <div class="col-md-12">
+                            <h2>
+                                <img src="~/Content/images/rejected.png" width="190" height="70" style="float: right">
+                                Report TO Preview (Rejected)
+                            </h2>
+
+                        </div>
+                        <div class="col-md-12">
+                            <label style="font-weight: bold; margin-right: 10px; font-size: 20px"> Alasan Reject: </label><label style=" margin-right: 10px; font-size: 20px" id="txtAlasanReject"></label>
+                        </div>
+                        <hr class="solid">
+                    </div>
+                    <div style="border-style: groove">
+                        <div style="margin: 90px">
+                            <div class="col-md-12">
+                                <h1 style="font-weight: bold"> Memo </h1> <br />
+                                <div style="width: 100%;">
+                                    <div style="width: 7%; float: left; ">
+                                        <text>No</text>
+                                        <text style="float: right">:</text>
+                                    </div>
+                                    <div style="margin-left: 10%;">
+                                        <text id="txtNoTO">TC/114/M-INT/VII/DF-TO/2022 </text>
+                                    </div>
+                                </div>
+                                <div style="width: 100%;">
+                                    <div style="width: 7%; float: left; ">
+                                        <text>To</text>
+                                        <text style="float: right">:</text>
+                                    </div>
+                                    <div style="margin-left: 10%;">
+                                        <text>MSSD </text>
+                                    </div>
+                                </div>
+                                <div style="width: 100%;">
+                                    <div style="width: 7%; float: left; ">
+                                        <text>Cc</text>
+                                        <text style="float: right">:</text>
+                                    </div>
+                                    <div style="margin-left: 10%;">
+                                        <text><b>NSM, RM, Finance</b></text>
+                                    </div>
+                                </div>
+                                <div style="width: 100%;">
+                                    <div style="width: 7%; float: left; ">
+                                        <text>From</text>
+                                        <text style="float: right">:</text>
+                                    </div>
+                                    <div style="margin-left: 10%;">
+                                        <text>Trade & Channel</text>
+                                    </div>
+                                </div>
+                                <div style="width: 100%;">
+                                    <div style="width: 7%; float: left; ">
+                                        <text>Date</text>
+                                        <text style="float: right">:</text>
+                                    </div>
+                                    <div style="margin-left: 10%;">
+                                        <text id="txtApproveDate">Jul 20 2022 </text>
+                                    </div>
+                                </div>
+                                <div style="width: 100%;">
+                                    <div style="width: 7%; float: left; ">
+                                        <text>Re</text>
+                                        <text style="float: right">:</text>
+                                    </div>
+                                    <div style="margin-left: 10%;">
+                                        <text id="txtRemarks">
+                                            Memo Permintaan Pembayaran Biaya Gaji Salesman TO Subdist Periode Juni
+                                            2022
+                                        </text>
+                                    </div>
+                                </div>
+                                <hr style="height: 2px; border-width: 0; color: black; background-color: black">
+                            </div>
+                            <div class="col-md-12">
+                                <div>
+                                    <label>Dengan Hormat, </label><br /><br />
+                                    <label>Bersama ini kami sampaikan persetujuan pembayaran biaya gaji salesman TO Subdist:</label> <br />
+                                    <div class="col-md-6" style="margin-left: 50px">
+                                        <div style="width: 100%;">
+                                            <div style="width: 20%; float: left; ">
+                                                <text>Periode</text>
+                                                <text style="float: right">:</text>
+                                            </div>
+                                            <div style="margin-left: 25%;">
+                                                <b id="txtPeriode">Juni 2022 </b>
+                                            </div>
+                                        </div>
+                                        <div style="width: 100%;">
+                                            <div style="width: 20%; float: left; ">
+                                                <text>Region</text>
+                                                <text style="float: right">:</text>
+                                            </div>
+                                            <div style="margin-left: 25%;">
+                                                <b id="txtRegion">Region tes </b>
+                                            </div>
+                                        </div>
+                                        <div style="width: 100%;">
+                                            <div style="width: 20%; float: left; ">
+                                                <text>Total</text>
+                                                <text style="float: right">:</text>
+                                            </div>
+                                            <div style="margin-left: 25%;">
+                                                <b id="txtTotalNumber">Rp.67,228,263.51</b>
+                                            </div>
+                                        </div>
+                                        <div style="width: 100%;">
+                                            <div style="width: 20%; float: left; ">
+
+                                            </div>
+                                            <div style="margin-left: 25%;">
+                                                <b>
+                                                    <i id="txtTotalWords">
+                                                        (ENAM PULUH TUJUH JUTA DUA RATUS DUA
+                                                        PULUH DELAPAN RIBU DUA RATUS ENAM
+                                                        PULUH TIGA KOMA LIMA SATU )
+                                                    </i>
+                                                </b>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br />
+                                    <label>Adapun pembayaran ini memotong saldo development fund yang ada di subdist ybs</label><br />
+                                    <label><b>Note : rincian nilai biaya gaji per Subdist, terlampir </b></label> <br />
+                                    <label>
+                                        Demikian Memo ini kami sampaikan, atas perhatian dan kerjasamanya kami ucapkan
+                                        terima kasih.
+                                    </label> <br /> <br />
+                                    <label>Hormat Kami,  </label><br /><br />
+                                </div>
+                            </div>
+
+                            <div class="col-md-12">
+                                <br />
+                                <br />
+                                <div style="text-align: center; display: flex;justify-content: center;">
+                                    <div  style="margin-left: 10px; margin-right: 10px ">
+                                        <b>
+                                            <p><u id="txtApprover1">This text will be underlined.</u></p>
+                                        </b>
+                                        <b id="txtJabatan1">Jabatan</b> 
+                                    </div>
+                                    <div style="margin-left: 10px; margin-right: 10px ">
+                                        <b>
+                                            <p><u id="txtApprover2">This text will be underlined.</u></p>
+                                        </b>
+                                        <b id="txtJabatan2">Jabatan</b>
+                                    </div>
+                                    <div  style="margin-left: 10px; margin-right: 10px ">
+                                        <b>
+                                            <p><u id="txtApprover3">This text will be underlined.</u></p>
+                                        </b>
+                                        <b id="txtJabatan3">Jabatan</b> 
+                                    </div>
+                                   
+                                    <div style="margin-left: 10px; margin-right: 10px ">
+                                        <b>
+                                            <p><u id="txtApprover4">This text will be underlined.</u></p>
+                                        </b>
+                                        <b id="txtJabatan4">Jabatan</b> 
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+<div class="row" style="margin: 0 auto; ">
+    <div class="card" style="width: 95%; margin: 0 auto; ">
+        <div class="card-body">
+            <div style="border-style: groove">
+                <div style="margin: 90px">
+                    <div class="col-md-12">
+                        <div style="height: 30px">
+                            <label style="line-height: 40px; margin-right: 2px; font-weight: bold; font-size: 20px">Lampiran Memo Gaji TO Bulan</label>
+                            <label style="line-height: 40px; font-weight: bold; margin-left: 100px; font-size: 20px" id="txtPeriodeDetail">Periode :</label>
+                            <label style="line-height: 40px; font-weight: bold; margin-left: 50px; font-size: 20px" id="txtNoSurat">NoSurat</label>
+                        </div>
+                        <table id="tbl_Detail" class="cell-border" style="width: 100%; float: left;margin-left: -32px">
+                            <thead style="font-size: 15px; text-align: center">
+                            <tr>
+                                <th>No</th>
+                                <th>Reg</th>
+                                <th>Cabang</th>
+                                <th>ShipToID</th>
+                                <th>Subdist</th>
+                                <th>Depo</th>
+                                <th>Nama</th>
+                                <th>Klaim TO</th>
+                                <th>No. Klaim</th>
+                            </tr>
+                            </thead>
+                            <tbody style="font-size: 15px"></tbody>
+                            <tfoot class="cell-border" style="font-size: 15px">
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <div id="wrap" style="text-align: center; display: flex; justify-content: center;">
+                        <div  style="margin-top: 60px; margin-left: 10px; margin-right: 10px">
+                            <b>
+                                <p><u id="txtApprover1Detail">This text will be underlined.</u></p>
+                            </b>
+                            <text id="txtJabatan1Detail" style="font-style: italic">Jabatan</text> <br />
+                        </div>
+
+                        <div  style="margin-top: 60px; margin-left: 10px; margin-right: 10px">
+                            <b>
+                                <p><u id="txtApprover2Detail">This text will be underlined.</u></p>
+                            </b>
+                            <text id="txtJabatan2Detail" style="font-style: italic">Jabatan</text> <br />
+                        </div>
+
+                        <div style="margin-top: 60px; margin-left: 10px; margin-right: 10px">
+                            <b>
+                                <p><u id="txtApprover3Detail">This text will be underlined.</u></p>
+                            </b>
+                            <text id="txtJabatan3Detail" style="font-style: italic">Jabatan</text> <br />
+                        </div>
+                        
+                        <div style="margin-top: 60px; margin-left: 10px; margin-right: 10px">
+                            <b>
+                                <p><u id="txtApprover4Detail">This text will be underlined.</u></p>
+                            </b>
+                            <text id="txtJabatan4Detail" style="font-style: italic">Jabatan</text> <br />
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <br/>
+<div class="card" id="divAction" hidden>
+    <br/>
+    <div class="card-body">
+        @*  <h2>Action</h2>
+                        <hr class="solid">*@
+        <div style="text-align: center;">
+            <button class="btn btn-primary approve" style="background-color: #28de7a; border-color: #28de7a; margin-left: 10px; width: 200px" id="btn_Approve">Approve <i class="fa-regular fa-circle-check"></i></button>
+            <button class="btn btn-primary reject" style="background-color: red; border-color: red; margin-left: 10px; margin: 0 auto; width: 200px" id="btn_Reject">Reject <i class="fa-solid fa-ban"></i></button>
+        </div>
+    </div>
+</div>
+
+
+</div>
+
+<script>
+    var noTO = "@Request.QueryString.Get("No_TO")";
+    var status = "@Request.QueryString.Get("Status")";
+    var lineNumber = "@Request.QueryString.Get("LineNumber")";
+    var alasanReject = '';
+    var currentdate = '';
+    var flagStatus = '';
+
+    $(document).ready(function () {
+        getTableDataDetail()
+        getData();
+        if (status == 'Pending') {
+            $('#divAction').attr('hidden', false);
+        } else {
+            $('#divAction').attr('hidden', true);
+        }
+
+        $('#btn_Approve').click(function () {
+            flagStatus = 'approve';
+            Swal.fire({
+                title: "Warning!",
+                text: "Approve Report?",
+                type: "warning",
+                showConfirmButton: true
+            }).then((result) => {
+                if (result.value) {
+                    currentdate = new Date().toLocaleString('en-GB');
+                    getEmailData();
+                }
+            });
+        });
+
+        $('#btn_Reject').click(function () {
+            flagStatus = 'rejected';
+          Swal.fire({
+                type: 'warning',
+                title: 'Mohon Masukkan Alasan Reject!',
+                input: 'textarea',
+                inputAttributes: {
+                    autocapitalize: 'off'
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Submit',
+                showLoaderOnConfirm: true,
+
+                allowOutsideClick: () => Swal.isLoading()
+            }).then((result) => {
+
+                if (result.value == null || result.value == '') {
+                    Swal.fire({
+                        type: 'error',
+                        title: 'Oops...',
+                        text: 'Alasan Reject Tidak Boleh Kosong!'
+                    });
+                } else {
+                    alasanReject = result.value;
+                    currentdate = new Date().toLocaleString('en-GB');
+                    getEmailData();
+                }
+            });
+        });
+
+        if (status === 'REJECTED') {
+            $('#divAction').attr('hidden', true);
+            $('#divNormal').attr('hidden', true);
+            $('#divReject').attr('hidden', false);
+
+            getAlasanReject();
+        }
+        if (status === 'APPROVED') {
+            $('#divAction').attr('hidden', true);
+        }
+    });
+
+    function getData() {
+        var dictlist = {
+            Option: "Get TO Report Data",
+            NoTO: noTO,
+            LineNumber: lineNumber
+        }
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                console.log(result);
+                $('#txtNoTO').text(noTO);
+                $('#txtApproveDate').text(result[0].ApproveDate);
+                $('#txtRemarks').text(result[0].Remarks);
+                $('#txtRegion').text(result[0].Region);
+                $('#txtPeriode').text(result[0].Periode);
+                $('#txtTotalNumber').text(result[0].TotalNumber);
+                $('#txtTotalWords').text('( ' + result[0].TotalWords + ')');
+                $('#txtApprover1').text(result[0].Approver1);
+                $('#txtApprover2').text(result[0].Approver2);
+                $('#txtApprover3').text(result[0].Approver3);
+                $('#txtApprover4').text(result[0].Approver4);
+                $('#txtJabatan1').text(result[0].Jabatan1);
+                $('#txtJabatan2').text(result[0].Jabatan2);
+                $('#txtJabatan3').text(result[0].Jabatan3);
+                $('#txtJabatan4').text(result[0].Jabatan4);
+            },
+            error: function(ex) {
+                console.log(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function approveReport() {
+        var dictlist = {
+            Option: "Approve Report TO",
+            NoTO: noTO,
+            LineNumber: lineNumber,
+            Uploader: "@Request.RequestContext.HttpContext.Session["UserName"]"
+        }
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                Swal.fire({
+                    title: "Report Approved!",
+                    type: "success",
+                    showConfirmButton: false,
+                    timer: 2100
+                }).then((result) => {
+                    window.location.href = '../CMS/CMS_TOApproval';
+                });
+            }, error: function (ex) {
+                console.log(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function rejectReport() {
+        var dictlist = {
+            Option: "Reject Report TO",
+            NoTO: noTO,
+            LineNumber: lineNumber,
+            AlasanReject: alasanReject,
+            Uploader: "@Request.RequestContext.HttpContext.Session["UserName"]"
+        }
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                Swal.fire({
+                    title: "Report Rejected!",
+                    type: "success",
+                    showConfirmButton: false,
+                    timer: 2500
+                }).then((result) => {
+                    window.location.href = '../CMS/CMS_TOApproval';
+                });
+            }, error: function (ex) {
+                console.log(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function getAlasanReject() {
+        var dictlist = {
+            Option: "Get Alasan Reject TO",
+            NoTO: noTO
+        }
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                $('#txtAlasanReject').text(' ' + result[0].Reject_Reason);
+            }, error: function (ex) {
+                console.log(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function getEmailData() {
+        if (flagStatus === 'approve') {
+            var dto = {
+                FlagStatus: flagStatus,
+                NoTO: noTO,
+                LineNumber: lineNumber,
+                Uploader: "@Request.RequestContext.HttpContext.Session["UserName"]"
+            }
+            $.ajax({
+                url: "../CMS/GetEmailDataTO",
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(dto),
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    approveReport();
+                }, error: function (ex) {
+                    console.log(JSON.stringify(ex));
+                }
+            });
+        }
+
+        else if (flagStatus === 'rejected') {
+            var dto = {
+                FlagStatus: flagStatus,
+                NoTO: noTO,
+                LineNumber: lineNumber,
+                AlasanReject: alasanReject,
+                Uploader: "@Request.RequestContext.HttpContext.Session["UserName"]",
+                WaktuReject: currentdate
+            }
+            $.ajax({
+                url: "../CMS/GetEmailDataTO",
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(dto),
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    rejectReport();
+                }, error: function (ex) {
+                    console.log(JSON.stringify(ex));
+                }
+            });
+        }
+    }
+
+    function getTableDataDetail() {
+        var dictlist = {
+            Option: "Get Table TO Detail Preview",
+            NoTO: noTO
+        }
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                var table = $('#tbl_Detail').DataTable({
+                    "pageLength": 5,
+                    "data": JSON.parse(data),
+                    "filter": false,
+                    "lengthChange": false,
+                    "paging": false,
+                    "info": false,
+                    "searching": false,
+                    "select": false,
+                    "bDestroy": true,
+                    "scrollCollapse": true,
+                    "columns": [
+                        { "data": "No" },
+                        { "data": "Reg" },
+                        { "data": "Cabang" },
+                        { "data": "ShipToID" },
+                        { "data": "Subdist" },
+                        { "data": "Depo" },
+                        { "data": "Nama" },
+                        { "data": "KlaimTO" },
+                        { "data": "NoKlaim" }
+                    ],
+
+                    "order": [[0, 'asc']],
+                    "columnDefs": [
+                        //{ "width": "50%", "targets": [1] },
+                        { className: 'cell-border', "targets": "_all" },
+
+                    ]   
+                });
+                $('#txtPeriodeDetail').text(result[0].PeriodeDetail);
+                $('#txtNoSurat').text(result[0].NoTO);
+                $('#txtApprover1Detail').text(result[0].Approver1Detail);
+                $('#txtJabatan1Detail').text(result[0].Jabatan1Detail);
+
+                $('#txtApprover2Detail').text(result[0].Approver2Detail);
+                $('#txtJabatan2Detail').text(result[0].Jabatan2Detail);
+
+                $('#txtApprover3Detail').text(result[0].Approver3Detail);
+                $('#txtJabatan3Detail').text(result[0].Jabatan3Detail);
+
+                $('#txtApprover4Detail').text(result[0].Approver4Detail);
+                $('#txtJabatan4Detail').text(result[0].Jabatan4Detail);
+            },
+            error: function (ex) {
+                console.log(JSON.stringify(ex));
+            }
+        });
+    }
+</script>

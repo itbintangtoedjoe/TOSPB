@@ -1,0 +1,409 @@
+﻿
+@{
+    ViewBag.Title = "Confirm_Subdist";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="containers">
+    <div hidden="hidden">
+        <input id="txtNoMemo" type="text" value="@ViewBag.NoMemo" />
+    </div>
+    <div class="col-md-12">
+        <div id="divloading" style="position:fixed;z-index:1000;margin:auto;text-align:center;margin-left:350px;margin-top:200px;" hidden="hidden">
+            <img src="~/Content/images/Loading.gif" style="width:50%;height:50%;">
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h4 class="card-title">Upload Memo</h4>
+
+                <hr />
+                @*<p class="text-muted m-b-15 f-s-12">Use the input classes on an <code>.input-default, input-flat, .input-rounded</code> for Default input.</p>*@
+                <div class="basic-form">
+                    <div class="row">
+                        <div class="col-md-2">
+                            Periode SPBR:
+                        </div>
+                        <div class="col-md-4">
+                            <select id="ddlPeriode" class="form-control" title="Periode" required>
+                            </select>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-2">
+                            Subdist Bayar:
+                        </div>
+                        <div class="col-md-4">
+
+                            <select id="ddl_Subdist" class="form-control select2" title="Subdist" disabled required>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="Total_Income">Total: </label>
+                            <input type="text" value="" id="Total_Income" disabled  required/>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-2">
+                            <label>Subdist Konfirm Buyer</label>
+                        </div>
+                        <div class="col-md-1">
+                            <input type="radio" id="Yes" name="SB_Konfirm" value="KONFIRM" checked>
+                            <label for="Yes">Ya</label>
+                        </div>
+                        <div class="col-md-1">
+
+                            <input type="radio" id="No" name="SB_Konfirm" value="NOT KONFIRM">
+                            <label for="No">No</label>
+                        </div>
+                        <div class="col-md-1">
+
+                            <input type="radio" id="EO" name="SB_Konfirm" value="KONFIRM EO">
+                            <label for="EO" id="EOLbl">EO</label>
+                        </div>
+                    </div>
+
+                    @*<button id="btnSaveDetail" type="submit" class="btn btn-dark m-t-20">Save Detail</button>*@
+                </div>
+
+                <br />
+                <div class="row" id="EO_div" hidden>
+                    <div class="col-md-2">
+                        EO:
+                    </div>
+                    <div class="col-md-4">
+                        <select style="width:100%;" id="ddlEO" class="form-control select2" title="EO">
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <button id="btnSave" type="submit" class="btn btn-primary m-t-20" style="background-color:forestgreen;">Konfirmasi</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" id="Card_SPB" hidden>
+            <div class="card-body">
+                <h4 class="card-title">List SPB</h4>
+                <hr />
+                @*<p class="text-muted m-b-15 f-s-12">Use the input classes on an <code>.input-default, input-flat, .input-rounded</code> for Default input.</p>*@
+
+                <div class="row">
+                    <div class="col-md-12" id="div_tblItemList">
+                        <table id="tbl_Subdist" class="table table-striped table-bordered zero-configuration">
+                            <thead>
+                                <tr>
+                                    <th>Period</th>
+                                    <th>SUBDISTBAYAR</th>
+                                    <th>KOTASUBDIST</th>
+                                    <th>Status Subdist Buyer</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tBodyItemList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    $(document).ready(function () {
+        $('#ddl_Subdist').select2()
+        getPeriode();
+        getEO();
+        $('#ddlPeriode').change(function () {
+            getsubdist();
+            $('#Total_Income').val('');
+            getspb();
+            $("#ddl_Subdist").attr("disabled", false);
+            //alert($('input[name="SB_Konfirm"]:checked').val());
+        });
+        $('#ddl_Subdist').change(function () {
+            gettotal();
+            //alert($('input[name="SB_Konfirm"]:checked').val());
+        });
+        $('input[name="SB_Konfirm"]').change(function () {
+
+            if ($('input[name="SB_Konfirm"]:checked').val() == 'KONFIRM EO') {
+                $('#EO_div').removeAttr("hidden");
+            }
+            else {
+                $('#EO_div').attr("hidden", true);
+            }
+
+        })
+        $('#btnSave').click(function () {
+            Save();
+        });
+    });
+    function getEO() {
+        var dictlist = {
+            Option: 10
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+
+                var Count = result.length;
+                var trHTML = '';
+                trHTML += '<option disabled selected hidden class="dropdown-header" value="-">--Please Select--</option>';
+                var trav = 0;
+                if (Count > 0) {
+                    for (trav = 0; trav < Count; trav++) {
+                        trHTML += '<Option value="' + result[trav].NoEO + '">' + result[trav].NamaEO + ' || ' + result[trav].BankEO;
+                    }
+                }
+
+                $("#ddlEO").empty();
+                $("#ddlEO").append(trHTML);
+                $('#ddlEO').select2()
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+    }
+    function getPeriode() {
+
+        var dictlist = {
+            Option: 6
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+
+                var Count = result.length;
+                var trHTML = '';
+                trHTML += '<option disabled selected hidden class="dropdown-header" value="-">--Please Select--</option>';
+                var trav = 0;
+                if (Count > 0) {
+                    for (trav = 0; trav < Count; trav++) {
+                        trHTML += '<Option value="' + result[trav].PERIODSPB + '">' + result[trav].PERIODSPB;
+                    }
+                }
+
+                $("#ddlPeriode").empty();
+                $("#ddlPeriode").append(trHTML);
+                $('#ddlPeriode').select2()
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+    }
+    function getsubdist() {
+        var dictlist = {
+            Option: 7,
+            Period: $("#ddlPeriode").val()
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+
+                var Count = result.length;
+                var trHTML = '';
+                trHTML += '<option disabled selected hidden class="dropdown-header" value="-">--Please Select--</option>';
+                var trav = 0;
+                if (Count > 0) {
+                    for (trav = 0; trav < Count; trav++) {
+                        trHTML += '<Option value="' + result[trav].SUBDISTBAYAR + ' || ' + result[trav].KOTASUBDIST + '">' + result[trav].SUBDISTBAYAR + ' || ' + result[trav].KOTASUBDIST;
+                    }
+                }
+
+                $("#ddl_Subdist").empty();
+                $("#ddl_Subdist").append(trHTML);
+                $('#ddl_Subdist').select2()
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+    }
+    function gettotal() {
+        var dictlist = {
+            Option: 8,
+            Period: $("#ddlPeriode").val(),
+            KotaSubdist: $('#ddl_Subdist').val()
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                console.log(result);
+                console.log($('#ddl_Subdist :selected').text());
+                console.log($('#ddl_Subdist').val());
+                console.log($("#ddlPeriode").val());
+                $('#Total_Income').val('RP. ' + result[0].Total)
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+    }
+
+    function getspb() {
+        $('#Card_SPB').attr("hidden", false);
+        var dictlist = {
+            Option: 9,
+            Period: $('#ddlPeriode').val()
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var table = $('#tbl_Subdist').DataTable({
+                    "pageLength": 10,
+                    "data": JSON.parse(data),
+                    "lengthChange": true,
+                    "paging": true,
+                    "info": false,
+                    "searching": false,
+                    "select": true,
+                    "bDestroy": true,
+                    "scrollCollapse": true,
+                    "columns": [
+                        { "data": "PERIODSPB" },
+                        { "data": "SubDistBayar" },
+                        { "data": "KotaSubdist" },
+                        { "data": "StatusSubdistBuyer" }
+                    ]
+                    //"columnDefs": [
+                    //    {
+                    //        "targets": [0],
+                    //        "visible": false,
+                    //        "searchable": false
+                    //    },
+                    //]
+                });
+            },
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                console.log(error);
+            }
+        });
+    }
+
+    function Save() {
+        var statsubdist = $('input[name="SB_Konfirm"]:checked').val();
+        var NoEO = $('#ddlEO').val();
+        if ($('input[name="SB_Konfirm"]:checked').val() == 'KONFIRM EO') {
+            statsubdist = 'KONFIRM EO'
+        }
+        else {
+            NoEO =''
+        }
+        if ($('#ddlPeriode').val() == null) {
+            swal({
+                title: "Warning!",
+                text: "Periode  Harus dipilih terlebih dahulu! ",
+                type: "warning",
+                showConfirmButton: false,
+                timer: 3000,
+            });
+            return
+        }
+        if ($('#ddl_Subdist').val() == null) {
+            swal({
+                title: "Warning!",
+                text: "Subdist Bayar Harus dipilih terlebih dahulu! ",
+                type: "warning",
+                showConfirmButton: false,
+                timer: 3000,
+            });
+            return
+        }
+        if ($('#ddlEO').val() == null && statsubdist == 'KONFIRM EO') {
+            swal({
+                title: "Warning!",
+                text: "EO Harus dipilih terlebih dahulu! ",
+                type: "warning",
+                showConfirmButton: false,
+                timer: 3000,
+            });
+            return
+        }
+        var dictlist = {
+            Option: 11,
+            Period: $("#ddlPeriode").val(),
+            KotaSubdist: $('#ddl_Subdist').val(),
+            NoEO: NoEO,
+            StatSubdist: statsubdist
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                swal({
+                    title: "Success!",
+                    text: "Status Subdist Berhasil Di Update! ",
+                    type: "success",
+                    showConfirmButton: false,
+                    timer: 1000,
+                });
+                window.location.reload();
+            },
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                console.log(error);
+            }
+        });
+    }
+</script>

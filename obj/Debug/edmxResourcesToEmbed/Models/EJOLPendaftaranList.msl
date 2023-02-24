@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+  <EntityContainerMapping StorageEntityContainer="EJOLModel1StoreContainer" CdmEntityContainer="EJOLEntitiesNew">
+    <EntitySetMapping Name="vw_Pendaftaran">
+      <EntityTypeMapping TypeName="EJOLModel1.vw_Pendaftaran">
+        <MappingFragment StoreEntitySet="vw_Pendaftaran">
+          <ScalarProperty Name="RecordID" ColumnName="RecordID" />
+          <ScalarProperty Name="RegistrationID" ColumnName="RegistrationID" />
+          <ScalarProperty Name="Periode" ColumnName="Periode" />
+          <ScalarProperty Name="NamaLengkap" ColumnName="NamaLengkap" />
+          <ScalarProperty Name="TanggalLahir" ColumnName="TanggalLahir" />
+          <ScalarProperty Name="JenisKelamin" ColumnName="JenisKelamin" />
+          <ScalarProperty Name="NoTelp" ColumnName="NoTelp" />
+          <ScalarProperty Name="Email" ColumnName="Email" />
+          <ScalarProperty Name="MemilikiLahan" ColumnName="MemilikiLahan" />
+          <ScalarProperty Name="LuasLahan" ColumnName="LuasLahan" />
+          <ScalarProperty Name="SaluranIrigasi" ColumnName="SaluranIrigasi" />
+          <ScalarProperty Name="JarakIrigasi" ColumnName="JarakIrigasi" />
+          <ScalarProperty Name="PengalamanJaheMerah" ColumnName="PengalamanJaheMerah" />
+          <ScalarProperty Name="TerkahirMenanamJaheMerah" ColumnName="TerkahirMenanamJaheMerah" />
+          <ScalarProperty Name="IsActive" ColumnName="IsActive" />
+          <ScalarProperty Name="RejectReason" ColumnName="RejectReason" />
+          <ScalarProperty Name="Hasil" ColumnName="Hasil" />
+          <ScalarProperty Name="CreationDate" ColumnName="CreationDate" />
+          <ScalarProperty Name="CreatedBy" ColumnName="CreatedBy" />
+          <ScalarProperty Name="UpdateDate" ColumnName="UpdateDate" />
+          <ScalarProperty Name="UpdateBy" ColumnName="UpdateBy" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+    <EntitySetMapping Name="vw_EJOLSchedule">
+      <EntityTypeMapping TypeName="EJOLModel1.vw_EJOLSchedule">
+        <MappingFragment StoreEntitySet="vw_EJOLSchedule">
+          <ScalarProperty Name="Alamat" ColumnName="Alamat" />
+          <ScalarProperty Name="PengirimanEndDate" ColumnName="PengirimanEndDate" />
+          <ScalarProperty Name="TanggalPengiriman" ColumnName="TanggalPengiriman" />
+          <ScalarProperty Name="Pengiriman" ColumnName="Pengiriman" />
+          <ScalarProperty Name="MonitoringPanenEndDate" ColumnName="MonitoringPanenEndDate" />
+          <ScalarProperty Name="TanggalMonitoringPanen" ColumnName="TanggalMonitoringPanen" />
+          <ScalarProperty Name="MonitoringPanen" ColumnName="MonitoringPanen" />
+          <ScalarProperty Name="PanenEndDate" ColumnName="PanenEndDate" />
+          <ScalarProperty Name="TanggalPanen" ColumnName="TanggalPanen" />
+          <ScalarProperty Name="Panen" ColumnName="Panen" />
+          <ScalarProperty Name="MonitoringEndDate" ColumnName="MonitoringEndDate" />
+          <ScalarProperty Name="TanggalMonitoring" ColumnName="TanggalMonitoring" />
+          <ScalarProperty Name="TahapKe" ColumnName="TahapKe" />
+          <ScalarProperty Name="Monitoring" ColumnName="Monitoring" />
+          <ScalarProperty Name="PenanamanEndDate" ColumnName="PenanamanEndDate" />
+          <ScalarProperty Name="TanggalPenanaman" ColumnName="TanggalPenanaman" />
+          <ScalarProperty Name="Penanaman" ColumnName="Penanaman" />
+          <ScalarProperty Name="SosialisasiEndDate" ColumnName="SosialisasiEndDate" />
+          <ScalarProperty Name="TanggalSosialiasi" ColumnName="TanggalSosialiasi" />
+          <ScalarProperty Name="Sosialiasi" ColumnName="Sosialiasi" />
+          <ScalarProperty Name="NoBatch_FK" ColumnName="NoBatch_FK" />
+          <ScalarProperty Name="MoU_FK" ColumnName="MoU_FK" />
+        </MappingFragment>
+      </EntityTypeMapping>
+    </EntitySetMapping>
+  </EntityContainerMapping>
+</Mapping>

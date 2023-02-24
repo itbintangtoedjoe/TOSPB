@@ -1,0 +1,21 @@
+﻿
+@{
+    ViewBag.Title = "Session_Error";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<link href="~/Content/plugins/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet" />
+<script src="~/Content/plugins/sweetalert2/dist/sweetalert2.min.js"></script>
+<script>
+         $(document).ready(function () {
+            @*CheckUser();*@
+             Swal.fire({
+                 title: 'Session Expired! Silahkan login Kembali ',
+                 type: "warning",
+                 showConfirmButton: false,
+                 timer: 3000,
+             }).then(() => {
+                 return window.location.href = '../Login/Index';
+             });
+         });
+
+</script>

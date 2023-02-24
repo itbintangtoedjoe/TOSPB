@@ -1,0 +1,121 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="EJOLModel1.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+  <!--Errors Found During Generation:
+warning 6002: The table/view 'EJOL.dbo.vw_EJOLSchedule' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+  <EntityType Name="vw_EJOLSchedule">
+    <Key>
+      <PropertyRef Name="MoU_FK" />
+      <PropertyRef Name="NoBatch_FK" />
+      <PropertyRef Name="Sosialiasi" />
+      <PropertyRef Name="Penanaman" />
+      <PropertyRef Name="Monitoring" />
+      <PropertyRef Name="Panen" />
+      <PropertyRef Name="MonitoringPanen" />
+      <PropertyRef Name="Pengiriman" />
+    </Key>
+    <Property Name="MoU_FK" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="NoBatch_FK" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="Sosialiasi" Type="bit" Nullable="false" />
+    <Property Name="TanggalSosialiasi" Type="nvarchar" MaxLength="30" />
+    <Property Name="SosialisasiEndDate" Type="datetime" />
+    <Property Name="Penanaman" Type="bit" Nullable="false" />
+    <Property Name="TanggalPenanaman" Type="nvarchar" MaxLength="30" />
+    <Property Name="PenanamanEndDate" Type="datetime" />
+    <Property Name="Monitoring" Type="bit" Nullable="false" />
+    <Property Name="TahapKe" Type="int" />
+    <Property Name="TanggalMonitoring" Type="nvarchar" MaxLength="30" />
+    <Property Name="MonitoringEndDate" Type="datetime" />
+    <Property Name="Panen" Type="bit" Nullable="false" />
+    <Property Name="TanggalPanen" Type="nvarchar" MaxLength="30" />
+    <Property Name="PanenEndDate" Type="datetime" />
+    <Property Name="MonitoringPanen" Type="bit" Nullable="false" />
+    <Property Name="TanggalMonitoringPanen" Type="nvarchar" MaxLength="30" />
+    <Property Name="MonitoringPanenEndDate" Type="datetime" />
+    <Property Name="Pengiriman" Type="bit" Nullable="false" />
+    <Property Name="TanggalPengiriman" Type="nvarchar" MaxLength="30" />
+    <Property Name="PengirimanEndDate" Type="datetime" />
+    <Property Name="Alamat" Type="nvarchar" MaxLength="4000" />
+  </EntityType>
+  <!--Errors Found During Generation:
+warning 6002: The table/view 'EJOL.dbo.vw_Pendaftaran' does not have a primary key defined. The key has been inferred and the definition was created as a read-only table/view.-->
+  <EntityType Name="vw_Pendaftaran">
+    <Key>
+      <PropertyRef Name="RecordID" />
+      <PropertyRef Name="RegistrationID" />
+    </Key>
+    <Property Name="RecordID" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+    <Property Name="RegistrationID" Type="nvarchar" MaxLength="50" Nullable="false" />
+    <Property Name="Periode" Type="nvarchar" MaxLength="50" />
+    <Property Name="NamaLengkap" Type="nvarchar" MaxLength="500" />
+    <Property Name="TanggalLahir" Type="nvarchar" MaxLength="30" />
+    <Property Name="JenisKelamin" Type="nvarchar" MaxLength="50" />
+    <Property Name="NoTelp" Type="nvarchar" MaxLength="50" />
+    <Property Name="Email" Type="nvarchar" MaxLength="50" />
+    <Property Name="MemilikiLahan" Type="bit" />
+    <Property Name="LuasLahan" Type="nvarchar" MaxLength="30" />
+    <Property Name="SaluranIrigasi" Type="bit" />
+    <Property Name="JarakIrigasi" Type="nvarchar" MaxLength="30" />
+    <Property Name="PengalamanJaheMerah" Type="bit" />
+    <Property Name="TerkahirMenanamJaheMerah" Type="nvarchar" MaxLength="50" />
+    <Property Name="IsActive" Type="bit" />
+    <Property Name="RejectReason" Type="nvarchar" MaxLength="4000" />
+    <Property Name="Hasil" Type="varchar" MaxLength="8" />
+    <Property Name="CreationDate" Type="datetime" />
+    <Property Name="CreatedBy" Type="nvarchar" MaxLength="50" />
+    <Property Name="UpdateDate" Type="datetime" />
+    <Property Name="UpdateBy" Type="nvarchar" MaxLength="50" />
+  </EntityType>
+  <EntityContainer Name="EJOLModel1StoreContainer">
+    <EntitySet Name="vw_EJOLSchedule" EntityType="Self.vw_EJOLSchedule" store:Type="Views" store:Schema="dbo">
+      <DefiningQuery>SELECT 
+    [vw_EJOLSchedule].[MoU_FK] AS [MoU_FK], 
+    [vw_EJOLSchedule].[NoBatch_FK] AS [NoBatch_FK], 
+    [vw_EJOLSchedule].[Sosialiasi] AS [Sosialiasi], 
+    [vw_EJOLSchedule].[TanggalSosialiasi] AS [TanggalSosialiasi], 
+    [vw_EJOLSchedule].[SosialisasiEndDate] AS [SosialisasiEndDate], 
+    [vw_EJOLSchedule].[Penanaman] AS [Penanaman], 
+    [vw_EJOLSchedule].[TanggalPenanaman] AS [TanggalPenanaman], 
+    [vw_EJOLSchedule].[PenanamanEndDate] AS [PenanamanEndDate], 
+    [vw_EJOLSchedule].[Monitoring] AS [Monitoring], 
+    [vw_EJOLSchedule].[TahapKe] AS [TahapKe], 
+    [vw_EJOLSchedule].[TanggalMonitoring] AS [TanggalMonitoring], 
+    [vw_EJOLSchedule].[MonitoringEndDate] AS [MonitoringEndDate], 
+    [vw_EJOLSchedule].[Panen] AS [Panen], 
+    [vw_EJOLSchedule].[TanggalPanen] AS [TanggalPanen], 
+    [vw_EJOLSchedule].[PanenEndDate] AS [PanenEndDate], 
+    [vw_EJOLSchedule].[MonitoringPanen] AS [MonitoringPanen], 
+    [vw_EJOLSchedule].[TanggalMonitoringPanen] AS [TanggalMonitoringPanen], 
+    [vw_EJOLSchedule].[MonitoringPanenEndDate] AS [MonitoringPanenEndDate], 
+    [vw_EJOLSchedule].[Pengiriman] AS [Pengiriman], 
+    [vw_EJOLSchedule].[TanggalPengiriman] AS [TanggalPengiriman], 
+    [vw_EJOLSchedule].[PengirimanEndDate] AS [PengirimanEndDate], 
+    [vw_EJOLSchedule].[Alamat] AS [Alamat]
+    FROM [dbo].[vw_EJOLSchedule] AS [vw_EJOLSchedule]</DefiningQuery>
+    </EntitySet>
+    <EntitySet Name="vw_Pendaftaran" EntityType="Self.vw_Pendaftaran" store:Type="Views" store:Schema="dbo">
+      <DefiningQuery>SELECT 
+    [vw_Pendaftaran].[RecordID] AS [RecordID], 
+    [vw_Pendaftaran].[RegistrationID] AS [RegistrationID], 
+    [vw_Pendaftaran].[Periode] AS [Periode], 
+    [vw_Pendaftaran].[NamaLengkap] AS [NamaLengkap], 
+    [vw_Pendaftaran].[TanggalLahir] AS [TanggalLahir], 
+    [vw_Pendaftaran].[JenisKelamin] AS [JenisKelamin], 
+    [vw_Pendaftaran].[NoTelp] AS [NoTelp], 
+    [vw_Pendaftaran].[Email] AS [Email], 
+    [vw_Pendaftaran].[MemilikiLahan] AS [MemilikiLahan], 
+    [vw_Pendaftaran].[LuasLahan] AS [LuasLahan], 
+    [vw_Pendaftaran].[SaluranIrigasi] AS [SaluranIrigasi], 
+    [vw_Pendaftaran].[JarakIrigasi] AS [JarakIrigasi], 
+    [vw_Pendaftaran].[PengalamanJaheMerah] AS [PengalamanJaheMerah], 
+    [vw_Pendaftaran].[TerkahirMenanamJaheMerah] AS [TerkahirMenanamJaheMerah], 
+    [vw_Pendaftaran].[IsActive] AS [IsActive], 
+    [vw_Pendaftaran].[RejectReason] AS [RejectReason], 
+    [vw_Pendaftaran].[Hasil] AS [Hasil], 
+    [vw_Pendaftaran].[CreationDate] AS [CreationDate], 
+    [vw_Pendaftaran].[CreatedBy] AS [CreatedBy], 
+    [vw_Pendaftaran].[UpdateDate] AS [UpdateDate], 
+    [vw_Pendaftaran].[UpdateBy] AS [UpdateBy]
+    FROM [dbo].[vw_Pendaftaran] AS [vw_Pendaftaran]</DefiningQuery>
+    </EntitySet>
+  </EntityContainer>
+</Schema>

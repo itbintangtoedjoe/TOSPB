@@ -1,0 +1,280 @@
+﻿
+@{
+    ViewBag.Title = "EditMemo";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<script>
+    $(document).ready(function () {
+        InitialPage();
+        GetPerodePA();
+    });
+
+    $(document).ready(function () {
+        $('#ddl_periode_pa').change(function () {
+            GetNoMemo();
+        });
+
+        $('#ddl_memo').change(function () {
+            GetTujuanSubdistBayar();
+        });
+    });
+
+    $(document).ready(function () {
+        $('#ddl_subdist_bayar').change(function () {
+            $('#CardDetailPA').attr('hidden', false);
+            GetSaldoPA();
+        });;
+
+        $('#btnSaveEditMemo').click(function () {
+            swal({
+                title: "Apakah Anda yakin Update Budget ?",
+                text: "Pastikan Data Yang Anda inputkan Benar !",
+                type: "warning",
+                showCancelButton: !0,
+                confirmButtonColor: "#DD6B55",
+                confirmButtonText: "Ya, Update Budget !!",
+                closeOnConfirm: !1
+            }, function () {
+                    UpdateAvailableBudget();
+            });
+        });
+    });
+
+
+    function InitialPage() {
+        $('#CardDetailPA').attr('hidden', true);
+    }    
+
+    function InitialValue() {
+        $('#txtBidgetAvailable').val('');
+        $('#txtBidgetAvailable').attr('placeholder', '*** Generate By System ***');
+
+        $('#txtEditBudget').val('');
+        $('#txtEditBudget').attr('placeholder','Silahkan Isi Nominal Budget');
+    }
+
+    function GetPerodePA() {
+        $.ajax({
+            url: 'GetPerodePA',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                var count = data.length;
+                var trhtml = '';
+                var trav = 0;
+
+                trhtml += '<option disabled selected hidden class="dropdown-header">*** Pilih Periode PA ***</option>';
+                if (count > 0) {
+                    for (trav = 0; trav < count; trav++) {
+                        trhtml += '<Option class="dropdown-item" value = "' + data[trav].PeriodTOSLA + '" > ' + data[trav].PeriodTOSLA;
+                    }
+                }
+                $("#ddl_periode_pa").empty();
+                $("#ddl_periode_pa").append(trhtml);
+
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function GetNoMemo() {
+        var PeriodPASend = $('#ddl_periode_pa').val();
+        $.ajax({
+            url: 'GetNoMemoWithPeriod?MonthPeriod=' + PeriodPASend,
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                var count = data.length;
+                var trhtml = '';
+                var trav = 0;
+
+                trhtml += '<option disabled selected hidden class="dropdown-header">*** Pilih Nomer Memo ***</option>';
+                if (count > 0) {
+                    for (trav = 0; trav < count; trav++) {
+                        trhtml += '<Option class="dropdown-item" value = "' + data[trav].NoMemo + '" > ' + data[trav].NoMemo;
+                    }
+                }
+                $("#ddl_memo").empty();
+                $("#ddl_memo").append(trhtml);                
+
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function GetTujuanSubdistBayar() {
+        var NoMemoSend = $("#ddl_memo").val();
+        var PeriodPASend = $('#ddl_periode_pa').val();
+        $.ajax({
+            url: 'GetSubdistBayarWithPeriod?NoMemo=' + NoMemoSend + "&MonthPeriod=" + PeriodPASend,
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                var count = data.length;
+                var trhtml = '';
+                var trav = 0;
+
+                trhtml += '<option disabled selected hidden class="dropdown-header">*** Pilih Subdist Bayar ***</option>';
+                if (count > 0) {
+                    for (trav = 0; trav < count; trav++) {
+                        trhtml += '<Option class="dropdown-item" value = "' + data[trav].LineNumber + '" > ' + data[trav].Description;
+                    }
+                }
+                $("#ddl_subdist_bayar").empty();
+                $("#ddl_subdist_bayar").append(trhtml);                
+
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function GetSaldoPA() {
+        var NoMemoSend = $('#ddl_memo').val();
+        var LineNumberSend = $('#ddl_subdist_bayar').val();        
+
+        $.ajax({
+            url: 'GetBudgetAvailableEdit?NoMemo=' + NoMemoSend + '&LineNumber=' + LineNumberSend,
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                $('#txtBidgetAvailable').val(data);
+
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function UpdateAvailableBudget() {
+        var NoMemoSend = $('#ddl_memo').val();
+        var LineNumberSend = $('#ddl_subdist_bayar').val(); 
+        var txtEditBudgetSend = $('#txtEditBudget').val();
+
+        $.ajax({
+            url: 'UpdateBudgetAvailable?NoMemo=' + NoMemoSend + '&LineNumber=' + LineNumberSend + '&Amt=' + txtEditBudgetSend,
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                if (data = 'VALID') {
+                    swal({
+                        title: "Update Budget Berhasil !!",
+                        text: "Anda Akan diarahkan ke Home",
+                        type: "success",
+                        timer: 2e3,
+                        showConfirmButton: !1
+
+                    }, function () {
+                        InitialValue();
+                        var url = "HomePage";
+                        $(location).attr('href', url);
+                    });
+                }
+                
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+</script>
+
+<div class="containers">
+    <div class="col-md-12">
+
+        <div id="CardHeaderPA" class="card">
+            <div class="card-body">
+                <h4 class="card-title">Edit Memo PA</h4>
+                <hr />
+                <div class="basic-form">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Periode PA
+                                </div>
+                                <div class="col-md-8">
+                                    <select id="ddl_periode_pa" class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Tipe Pembayaran
+                                </div>
+                                <div class="col-md-8">
+                                    <select id="ddl_tipe_bayar" class="form-control">
+                                        <option selected disabled>Silahkan Pilih Tipe Pembayaran</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    No Memo
+                                </div>
+                                <div class="col-md-8">
+                                    <select id="ddl_memo" class="form-control"></select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    List Subdist
+                                </div>
+                                <div class="col-md-8">
+
+                                    <select id="ddl_subdist_bayar" class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="CardDetailPA" class="card">
+            <div class="card-body">
+                <h4 class="card-title">Detail Edit PA</h4>
+                <div class="basic-form">
+                    <div class="row">
+                        <div class="col-md-12">                            
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Budget Available
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txtBidgetAvailable" type="text" class="form-control" readonly placeholder="*** Generate By System ***">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Edit Budget
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txtEditBudget" type="number" class="form-control" placeholder="Silahkan Isi Nominal Budget">
+                                </div>
+                            </div>
+                            <br />
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <button id="btnSaveEditMemo" type="submit" class="btn btn-dark m-t-20">Save</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

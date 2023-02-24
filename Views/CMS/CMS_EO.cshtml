@@ -1,0 +1,369 @@
+﻿
+@{
+    ViewBag.Title = "CMS_EO";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+
+    .dataTables_filter {
+        position: relative;
+    }
+
+        .dataTables_filter input {
+            width: 250px;
+            height: 32px;
+            background: #fcfcfc;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            box-shadow: 0 0 3px #ccc, 0 10px 15px #ebebeb inset;
+            text-indent: 10px;
+        }
+
+        .dataTables_filter .fa-search {
+            position: absolute;
+            top: 10px;
+            left: auto;
+            right: 10px;
+        }
+
+    @@media (min-width: 768px) {
+        .modal-xl {
+            width: 900%;
+            max-width: 1300px;
+        }
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">CMS EO</h4>
+                    <div class="row form-group-sm">
+                        <div class="col-md-6">
+                            <label class="m-t-20">Nama EO<span style="color: red">*</span></label>
+                            <input class="form-control" type="text" id="Nama_EO" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row form-group-sm">
+                        <div class="col-md-6">
+                            <label class="m-t-20">Bank EO<span style="color: red">*</span></label>
+                            <input class="form-control" type="text" id="Bank_EO" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row form-group-sm">
+                        <div class="col-md-6">
+                            <label class="m-t-20">No Rekening EO<span style="color: red">*</span></label>
+                            <input class="form-control" type="text" id="No_Rek_EO" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row form-group-sm">
+                        <div class="col-md-6">
+                            <label class="m-t-20">Atas Nama EO<span style="color: red">*</span></label>
+                            <input class="form-control" type="text" id="Atas_Nama_EO" />
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row form-group-sm mt-3">
+                        <div class="col-md-6">
+                            <button class="btn btn-primary" id="Insert_EO" >Insert EO</button>
+                        </div>
+                    </div>
+                    <div class="row form-group-sm mt-3">
+                        <div class="col-md-12">
+                            <div id="form_tableSPB" class="form-group row" >
+                                <table id="tbl_EO" class="table table-striped table-bordered zero-configuration">
+                                    <thead>
+                                        <tr>
+                                            <th>No EO</th>
+                                            <th>Nama</th>
+                                            <th>Bank</th>
+                                            <th>Atas Nama</th>
+                                            <th>Nomor Rekening</th>
+                                            <th></th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tBodyPA">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="Modal_Row" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update EO</h5>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row form-group-sm">
+                            <div class="col-md-6">
+                                <label class="m-t-20">Nama EO<span style="color: red">*</span></label>
+                                <input class="form-control" type="text" id="Nama_EO_mod" />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row form-group-sm">
+                            <div class="col-md-6">
+                                <label class="m-t-20">Bank EO<span style="color: red">*</span></label>
+                                <input class="form-control" type="text" id="Bank_EO_mod" />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row form-group-sm">
+                            <div class="col-md-6">
+                                <label class="m-t-20">No Rekening EO<span style="color: red">*</span></label>
+                                <input class="form-control" type="text" id="No_Rek_EO_mod" />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row form-group-sm">
+                            <div class="col-md-6">
+                                <label class="m-t-20">Atas Nama EO<span style="color: red">*</span></label>
+                                <input class="form-control" type="text" id="Atas_Nama_EO_mod" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="Cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn_Update">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        getEO();
+        $('#Insert_EO').click(function () {
+            InsertEO();
+        });
+        $('#SubdistBayar').change(function () {
+            $('#View_Report').attr('disabled', false);
+        })
+        $('#tbl_EO tbody').on('click', 'input[id="Updatebtn"]', function () {
+            var row = $(this).closest("TR");
+            var table = $('#tbl_EO').DataTable();
+            var tblrow = table.row(row).data();
+            $('#Nama_EO_mod').val(tblrow["NamaEO"]);
+            $('#Bank_EO_mod').val(tblrow["BankEO"]);
+            $('#No_Rek_EO_mod').val(tblrow["AtasNamaEO"]);
+            $('#Atas_Nama_EO_mod').val(tblrow["NoRekeningEO"]);
+        })
+        $('#btn_Update').click(function () {
+            var dictlist = {
+                Option: 4,
+                Nama_EO: $('#Nama_EO_mod').val(),
+                Bank_EO: $('#Bank_EO_mod').val(),
+                No_Rek_EO: $('#No_Rek_EO_mod').val(),
+                Atas_Nama_EO: $('#Atas_Nama_EO_mod').val(),
+            }
+
+            var dto = {
+                Model: dictlist
+            }
+            $.ajax({
+                url: "../UploadMemo/DynamicController?spname=SP_CMS_MasterEO",
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(dto),
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    var result = JSON.parse(data);
+                    swal({
+                        title: "Success!",
+                        text: "EO berhasil di update!",
+                        type: "success",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                    getEO();
+
+
+                }, error: function (ex) {
+                    console.log(JSON.stringify(ex))
+                }
+            });
+        })
+        $('#tbl_EO tbody').on('click', 'input[id="btn_Delete"]', function () {
+            var row = $(this).closest("TR");
+            var table = $('#tbl_EO').DataTable();
+            var tblrow = table.row(row).data();
+            var dictlist = {
+                Option: 3,
+                NoEO : tblrow["NoEO"]
+            }
+            var dto = {
+                Model: dictlist
+            }
+            $.ajax({
+                url: "../UploadMemo/DynamicController?spname=SP_CMS_MasterEO",
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(dto),
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    swal({
+                        title: "Success!",
+                        text: "EO berhasil di delete",
+                        type: "success",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                    getEO();
+
+
+                }, error: function (ex) {
+                    console.log(JSON.stringify(ex))
+                }
+            });
+        })
+
+    })
+    function getEO() {
+        var dictlist = {
+            Option: 1
+        }
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_CMS_MasterEO",
+            type: "POST",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var table = $('#tbl_EO').DataTable({
+                    "pageLength": 10,
+                    "data": JSON.parse(data),
+                    "filter": true,
+                    "lengthChange": true,
+                    "paging": true,
+                    "info": true,
+                    "searching": true,
+                    "select": true,
+                    "bDestroy": true,
+                    "scrollCollapse": true,
+                    "columns": [
+                        { "data": "NoEO" },
+                        { "data": "NamaEO" },
+                        { "data": "BankEO" },
+                        { "data": "AtasNamaEO" },
+                        { "data": "NoRekeningEO" },
+                        {
+                            "data": null,
+                            "defaultContent": '<input type="button" class="btn btn-primary" style="background-color:orange;" id="Updatebtn" data-toggle="modal" data-target="#Modal_Row" data-backdrop="static"  value="Update" />'
+                        },
+
+                        {
+                            "data": null,
+                            "defaultContent": "<input class='btn btn-primary' id='btn_Delete' style='background-color:red;' type='button' value='Delete' />"
+                        },
+                    ],
+                    
+                    "order": [[1, 'asc']],
+                });
+
+            }, error: function (ex) {
+                console.log(JSON.stringify(ex))
+            }
+        });
+        //var row = table.row(i);
+        //var tr = $(row.node());
+        //var checkbox = tr.find('td:first-child input[type="checkbox"]')
+
+    }
+    function InsertEO() {
+        var valid = true;
+        var dictlist = {
+            Option: 2,
+            Nama_EO: $('#Nama_EO').val(),
+            Bank_EO: $('#Bank_EO').val(),
+            No_Rek_EO: $('#No_Rek_EO').val(),
+            Atas_Nama_EO: $('#Atas_Nama_EO').val(),
+        }
+        $.each(dictlist, function (key, value) {
+            var keysplit = key.split('_');
+            if (value == null || value == '') {
+                if (keysplit.length == 3) {
+                    swal({
+                        title: "Error!",
+                        text: "Silahakan melengkapi " + keysplit[0] + " " + keysplit[1] + "" + keysplit[2] + " yang kosong terlebih dahulu",
+                        type: "error",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                    return valid = false;
+                }
+                else {
+                    swal({
+                        title: "Error!",
+                        text: "Silahakan melengkapi " + keysplit[0] + " " + keysplit[1] + " yang kosong terlebih dahulu",
+                        type: "error",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                    return valid = false;
+                }
+            }
+
+        });
+        var dto = {
+            Model: dictlist
+        }
+        if (valid == true) {
+            $.ajax({
+                url: "../UploadMemo/DynamicController?spname=SP_CMS_MasterEO",
+                type: "POST",
+                dataType: "json",
+                data: JSON.stringify(dto),
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    var result = JSON.parse(data);
+                    if (result[0].Stat == "Invalid") {
+                        swal({
+                            title: "Error!",
+                            text: "EO sudah terdaftar",
+                            type: "error",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        });
+                    }
+                    else {
+                        swal({
+                            title: "Success!",
+                            text: "EO berhasil didaftarkan",
+                            type: "success",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        });
+
+                        getEO();
+                    }
+                    
+
+                }, error: function (ex) {
+                    console.log(JSON.stringify(ex))
+                }
+            });
+        }
+    }
+</script>
+

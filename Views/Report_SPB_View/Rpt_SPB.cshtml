@@ -1,0 +1,48 @@
+﻿
+@{
+    ViewBag.Title = "Rpt_SPB";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="content-body">
+    <div class="form-group">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <input id="No_Surat" name="nocapa" class="form-control" type="text" value="@ViewBag.No_Surat" hidden />
+                            <iframe id="ifrmReportViewer" style="height:3500px; width:100%;" frameborder="0" scrolling="no"></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+            $(document).ready(function () {
+                var No_Surat = $("#No_Surat").val();
+                /*            alert(nocapa);*/
+                ReportValidationCheck(No_Surat);
+            });
+           function ReportValidationCheck(No_Surat) {
+
+               url = "../Report_SPB/Rpt_SPB_Memo.aspx?No_Surat=" + No_Surat + "";
+
+                var myframe = document.getElementById("ifrmReportViewer");
+                if (myframe !== null) {
+                    if (myframe.src) {
+                        myframe.src = url;
+                    }
+                    else if (myframe.contentWindow !== null && myframe.contentWindow.location !== null) {
+                        myframe.contentWindow.location = url;
+                    }
+                    else {
+                        myframe.setAttribute('src', url);
+                    }
+                }
+                return false;
+            }
+</script>

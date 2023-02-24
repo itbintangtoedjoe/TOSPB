@@ -1,0 +1,958 @@
+﻿
+@{
+    ViewBag.Title = "MappingApprover";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<style>
+ 
+
+    .dataTables_filter {
+        position: relative;
+    }
+
+    .dataTables_filter input {
+        width: 250px;
+        height: 32px;
+        background: #fcfcfc;
+        border: 1px solid #aaa;
+        border-radius: 5px;
+        box-shadow: 0 0 3px #ccc, 0 10px 15px #ebebeb inset;
+        text-indent: 10px;
+    }
+
+    .dataTables_filter .fa-search {
+        position: absolute;
+        top: 10px;
+        left: auto;
+        right: 10px;
+    }
+
+    @@media (min-width: 768px) {
+        .modal-xl {
+            width: 900%;
+            max-width: 1300px;
+        }
+    }
+
+    .select2-selection__rendered {
+        line-height: 40px !important;
+    }
+
+    .select2-container .select2-selection--single {
+        height: 40px !important;
+    }
+
+    .select2-selection__arrow {
+        height: 40px !important;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+        <div class="card">
+            <div class="card-body">
+                <h2>Mapping Approver</h2>
+                <hr class="solid">
+                <br />
+                <div class="row form-group-sm">
+                    <div class="col-md-5">
+                        <h5>Choose TO/SPB</h5>
+                        <select id="ddlChoose" class="form-control" style="width: 100%">
+                            <option value="" class="dropdown-header" selected disabled>Select TO or SPB</option>
+                            <option class="dropdown-header" value="TO">TO</option>
+                            <option class="dropdown-header" value="SPB">SPB</option>
+                        </select>
+                        <div id="divddlTO" hidden>
+                            <br />
+                            <h5>Choose No. TO:</h5>
+                            <select id="ddlNoTO" class="form-control" style="width: 100%">
+                                <option value="" class="dropdown-header" selected disabled>Select Nomor TO</option>
+                            </select>
+                        </div>
+                        <div id="divddlSPB" hidden>
+                            <br />
+                            <h5>Choose No. SPB:</h5>
+                            <select id="ddlNoSPB" class="form-control" style="width: 100%">
+                                <option value="" class="dropdown-header" selected disabled>Select Nomor SPB</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <br />
+                <div id="divHidden" hidden>
+                    <div id="divApprover1">
+                        <hr class="solid">
+                        <h5>Approver 1</h5>
+                        <div class="row form-group-sm">
+                            <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                <label for="ddlApprover1" style="line-height: 40px;">Nama:</label>
+                                <div style="width: 60%; margin-left: auto; margin-right: 0; ">
+                                    <select id="ddlApprover1" class="form-control" style="width: 100%;">
+                                        <option value="1" class="dropdown-header" selected>-</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row form-group-sm">
+                            <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                <label for="ddlApprover1" style="line-height: 40px;">Jabatan:</label>
+                                <input class="form-control" type="text" id="txtJabatan1" style="width: 60%; margin-left: auto; margin-right: 0;" disabled />
+                            </div>
+                        </div>
+                        <div id="divApprover2">
+                            <hr class="solid">
+                            <h5>Approver 2</h5>
+                            <div class="row form-group-sm">
+                                <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                    <label for="ddlApprover2" style="line-height: 40px;">Nama:</label>
+                                    <div style="width: 60%; margin-left: auto; margin-right: 0; ">
+                                        <select id="ddlApprover2" class="form-control" style="width: 100%;" disabled>
+                                            <option value="2" class="dropdown-header" selected>-</option>
+                                        </select>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row form-group-sm">
+                                <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                    <label for="ddlApprover2" style="line-height: 40px;">Jabatan:</label>
+                                    <input class="form-control" type="text" id="txtJabatan2" style="width: 60%; margin-left: auto; margin-right: 0;" disabled />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="divApprover3">
+                            <br />
+                            <hr class="solid">
+                            <h5>Approver 3</h5>
+                            <div class="row form-group-sm">
+                                <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                    <label for="txtApprover3" style="line-height: 40px;">Nama:</label>
+                                    <input class="form-control" type="text" id="txtApprover3" placeholder="-"  style="width: 60%; margin-left: auto; margin-right: 0;" disabled />
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row form-group-sm">
+                                <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                    <label for="txtJabatan3" style="line-height: 40px;">Jabatan:</label>
+                                    <input class="form-control" type="text" id="txtJabatan3" style="width: 60%; margin-left: auto; margin-right: 0;" disabled />
+                                    <input class="form-control" type="text" id="txtEmail3" hidden />
+
+                                </div>
+                            </div>
+
+                        </div>
+                        <div id="divApprover4">
+                            <br />
+                            <hr class="solid">
+                            <h5>Approver 4</h5>
+                            <div class="row form-group-sm">
+                                <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                    <label for="txtApprover4" style="line-height: 40px;">Nama:</label>
+                                    <input class="form-control" type="text" id="txtApprover4" placeholder="-" style="width: 60%; margin-left: auto; margin-right: 0;" disabled />
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row form-group-sm">
+                                <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                    <label for="txtJabatan4" style="line-height: 40px;">Jabatan:</label>
+                                    <input class="form-control" type="text" id="txtJabatan4" style="width: 60%; margin-left: auto; margin-right: 0;" disabled />
+                                    <input class="form-control" type="text" id="txtEmail4" hidden />
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card" >
+            <div class="card-body" id="divDetail" hidden>
+                <br />
+                <div id="divHiddenDetail">
+                    <div id="divApproverDetail1">
+                        <hr class="solid">
+                        <h5>Approver Detail 1</h5>
+                        <div class="row form-group-sm">
+                            <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                <label for="ddlApproverDetail1" style="line-height: 40px;">Nama:</label>
+                                <div style="width: 60%; margin-left: auto; margin-right: 0; ">
+                                    <select id="ddlApproverDetail1" class="form-control" style="width: 100%;">
+                                        <option value="5" class="dropdown-header" selected >-</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row form-group-sm">
+                            <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                <label for="ddlApproverDetail1" style="line-height: 40px;">Jabatan:</label>
+                                <input class="form-control" type="text" id="txtJabatanDetail1" style="width: 60%; margin-left: auto; margin-right: 0;" disabled />
+                            </div>
+                        </div>
+                        <h5>Approver Detail 2</h5>
+                        <div class="row form-group-sm">
+                            <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                <label for="ddlApproverDetail2" style="line-height: 40px;">Nama:</label>
+                                <div style="width: 60%; margin-left: auto; margin-right: 0; ">
+                                    <select id="ddlApproverDetail2" class="form-control" style="width: 100%;">
+                                        <option value="6" class="dropdown-header" selected >-</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br/>
+                        <div class="row form-group-sm">
+                            <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                <label for="txtJabatanDetail2" style="line-height: 40px;">Jabatan:</label>
+                                <input class="form-control" type="text" id="txtJabatanDetail2" style="width: 60%; margin-left: auto; margin-right: 0;" disabled />
+                            </div>
+                        </div>
+                        <h5>Approver Detail 3</h5>
+                        <div class="row form-group-sm">
+                            <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                <label for="ddlApproverDetail3" style="line-height: 40px;">Nama:</label>
+                                <div style="width: 60%; margin-left: auto; margin-right: 0; ">
+                                    <select id="ddlApproverDetail3" class="form-control" style="width: 100%;">
+                                        <option value="7" class="dropdown-header" selected >-</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row form-group-sm">
+                            <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                <label for="txtJabatanDetail3" style="line-height: 40px;">Jabatan:</label>
+                                <input class="form-control" type="text" id="txtJabatanDetail3" style="width: 60%; margin-left: auto; margin-right: 0;" disabled />
+                            </div>
+                        </div>
+                        <h5>Approver Detail 4</h5>
+                        <div class="row form-group-sm">
+                            <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                <label for="ddlApproverDetail4" style="line-height: 40px;">Nama:</label>
+                                <div style="width: 60%; margin-left: auto; margin-right: 0; ">
+                                    <select id="ddlApproverDetail4" class="form-control" style="width: 100%;">
+                                        <option value="8" class="dropdown-header" selected >-</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row form-group-sm">
+                            <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                <label for="txtJabatanDetail4" style="line-height: 40px;">Jabatan:</label>
+                                <input class="form-control" type="text" id="txtJabatanDetail4" style="width: 60%; margin-left: auto; margin-right: 0;" disabled />
+                            </div>
+                        </div>
+
+                        <div id="divTO" hidden>
+                            <br />
+                            <hr class="solid">
+                            <h5>Please Input Region and Remarks!</h5>
+                            <br />
+                            <div class="row form-group-sm">
+                                <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                    <label for="txtApprover3" style="line-height: 40px;">Region: </label>
+                                    <textarea id="txtRegion" placeholder="Please Input the Region!" style="width: 60%; margin-left: auto; margin-right: 0;"> </textarea>
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row form-group-sm">
+                                <div class="col-md-5" style="display: flex; vertical-align: middle;">
+                                    <label for="txtJabatan3" style="line-height: 40px;">Remarks: </label>
+                                    <textarea placeholder="Please Input Remarks!" id="txtRemarks" style="width: 60%; margin-left: auto; margin-right: 0;"> </textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <br />
+                        <hr class="solid">
+                        <div class="row form-group-sm mt-3">
+                            <br />
+                            <div class="col-md-6">
+                                <button class="btn btn-primary" id="btnSubmitMapping">Submit Mapping</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    var waktu = '';
+    $(document).ready(function () {
+        getNoSPB();
+        getNoTO();
+        getApproverDDL();
+        getApproverData();
+
+        $('#ddlNoSPB').select2();
+        $('#ddlChoose').select2();
+        $('#ddlNoTO').select2();
+
+        $('#ddlApprover1').select2();
+        $('#ddlApprover2').select2();
+
+        $('#ddlApproverDetail1').select2();
+        $('#ddlApproverDetail2').select2();
+        $('#ddlApproverDetail3').select2();
+        $('#ddlApproverDetail4').select2();
+
+        $('#ddlChoose').change(function () {
+            clearDDL();
+            //getApproverData();
+            $('#divTO').attr('hidden', true);
+            $('#divHidden').attr('hidden', true);
+            $('#divDetail').attr('hidden', true);
+            $('#ddlApprover2').attr('disabled', true);
+            $('#ddlApproverDetail2').attr('disabled', true);
+            $('#ddlApproverDetail3').attr('disabled', true);
+            $('#ddlApproverDetail4').attr('disabled', true);
+
+            if ($('#ddlChoose').val() == 'TO') {
+                $('#divddlTO').attr('hidden', false);
+                $('#divddlSPB').attr('hidden', true);
+            }
+            else if ($('#ddlChoose').val() == 'SPB')  {
+                $('#divddlSPB').attr('hidden', false);
+                $('#divddlTO').attr('hidden', true);
+            }
+        });
+        
+        $('#ddlApprover1').change(function () {
+            
+            
+            if ($('#ddlApprover1').val() == '1') {
+                $('#txtJabatan1').val('-');
+                $('#ddlApprover2').attr('disabled', true);
+                $('#ddlApprover2').val('2').change();
+            } else {
+                $('#ddlApprover2').attr('disabled', false);
+            }
+            getJabatan(1);
+            
+        });
+
+        $('#ddlApprover2').change(function () {
+            getJabatan(2);
+            if ($('#ddlApprover2').val() == '2') {
+                $('#txtJabatan2').val('-');
+            }
+        });
+
+        $('#ddlApproverDetail1').change(function () {
+            getJabatan(5);
+            if ($('#ddlApproverDetail1').val() == '5') {
+                $('#txtJabatanDetail1').val('-');
+                $('#ddlApproverDetail2').attr('disabled', true);
+                $('#ddlApproverDetail2').val('6').change();
+                $('#ddlApproverDetail3').val('7').change();
+                $('#ddlApproverDetail4').val('8').change();
+            } else {
+                $('#ddlApproverDetail2').attr('disabled', false);
+            }
+           
+        });
+
+        $('#ddlApproverDetail2').change(function () {
+          
+            getJabatan(6);
+            if ($('#ddlApproverDetail2').val() == '6') {
+                $('#txtJabatanDetail2').val('-');
+                $('#ddlApproverDetail3').attr('disabled', true);
+                $('#ddlApproverDetail3').val('7').change();
+                $('#ddlApproverDetail4').val('8').change();
+            } else {
+                $('#ddlApproverDetail3').attr('disabled', false);
+            }
+            
+        });
+
+        $('#ddlApproverDetail3').change(function () {
+            
+            getJabatan(7);
+            if ($('#ddlApproverDetail3').val() == '7') {
+                $('#txtJabatanDetail3').val('-');
+                $('#ddlApproverDetail4').attr('disabled', true);
+                $('#ddlApproverDetail4').val('8').change();
+            } else {
+                $('#ddlApproverDetail4').attr('disabled', false);
+            }
+           
+        });
+
+        $('#ddlApproverDetail4').change(function () {
+          
+            getJabatan(8);
+            if ($('#ddlApproverDetail4').val() == '8') {
+                $('#txtJabatanDetail4').val('-');
+            }
+        });
+
+
+
+        $('#ddlNoSPB').change(function () {
+            $('#divHidden').attr('hidden', false);
+            $('#divDetail').attr('hidden', false);
+            $('#divTO').attr('hidden', true);
+        });
+
+        $('#ddlNoTO').change(function () {
+            $('#divDetail').attr('hidden', false);
+            $('#divHidden').attr('hidden', false);
+            $('#divTO').attr('hidden', false);
+        });
+
+        $("#btnSubmitMapping").click(function () {
+
+                if ($('#ddlChoose').val() == 'SPB') {
+                    //Approver  duplicate validation
+                    var approverArr = [];
+
+                    approverArr.push($('#ddlApprover1 option:selected').text());
+                    approverArr.push($('#ddlApprover2 option:selected').text());
+                    //approverArr.push($('#txtApprover3').val());
+                    //approverArr.push($('#txtApprover4').val());
+
+                    approverArr.push('3');
+                    approverArr.push('4');
+
+                    var flagDuplicate = 0;
+
+                    var duplicatesArr = {};
+
+                    approverArr.forEach(function (str) {
+                        if (duplicatesArr[str]) {
+                            if (str != '-') {
+                                flagDuplicate = 1;
+                                Swal.fire({
+                                    title: "Error!",
+                                    text: "Approver tidak boleh sama!",
+                                    type: "error",
+                                    showConfirmButton: false,
+                                    timer: 2000
+                                });
+                            }
+
+                            //console.log(str);
+                        } else {
+                            duplicatesArr[str] = true;
+                        }
+                    });
+                    //console.log(approverArr)
+                    //console.log(duplicatesArr);
+                    if (flagDuplicate == 0) {
+                        //Approver detail duplicate validation
+                        var approverDetailArr = [];
+
+                        approverDetailArr.push($('#ddlApproverDetail1 option:selected').text());
+                        approverDetailArr.push($('#ddlApproverDetail2 option:selected').text());
+                        approverDetailArr.push($('#ddlApproverDetail3 option:selected').text());
+                        approverDetailArr.push($('#ddlApproverDetail4 option:selected').text());
+
+                        var flag = 0;
+
+                        var duplicates = {};
+
+                        approverDetailArr.forEach(function (str) {
+                            if (duplicates[str]) {
+                                if (str != '-') {
+                                    flag = 1;
+                                    Swal.fire({
+                                        title: "Error!",
+                                        text: "Approver Detail tidak boleh sama!",
+                                        type: "error",
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                }
+
+                                //console.log(str);
+                            } else {
+                                duplicates[str] = true;
+                            }
+                        });
+
+                        if (flag == 0) {
+                            validationSubmitSPB();
+                        }
+                    }
+                }
+                            
+                else if ($('#ddlChoose').val() == 'TO') {
+                    if ($('#txtRegion').val() == ' ' || $('#txtRegion').val() == null || $('#txtRegion').val() == '') {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Mohon Mengisi Region!",
+                            type: "error",
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+
+                    else if ($('#txtRemarks').val() == ' ' || $('#txtRemarks').val() == null || $('#txtRemarks').val() == '') {
+                        Swal.fire({
+                            title: "Error!",
+                            text: "Mohon Mengisi Remarks!",
+                            type: "error",
+                            showConfirmButton: false,
+                            timer: 2000
+                        });
+                    }
+
+                    else {
+                        //Approver  duplicate validation
+                        var approverArr = [];
+
+                        approverArr.push($('#ddlApprover1 option:selected').text());
+                        approverArr.push($('#ddlApprover2 option:selected').text());
+                        //approverArr.push($('#txtApprover3').val());
+                        //approverArr.push($('#txtApprover4').val());
+
+                        approverArr.push('3');
+                        approverArr.push('4');
+
+                        var flagDuplicate = 0;
+
+                        var duplicatesArr = {};
+
+                        approverArr.forEach(function (str) {
+                            if (duplicatesArr[str]) {
+                                if (str != '-') {
+                                    flagDuplicate = 1;
+                                    Swal.fire({
+                                        title: "Error!",
+                                        text: "Approver tidak boleh sama!",
+                                        type: "error",
+                                        showConfirmButton: false,
+                                        timer: 2000
+                                    });
+                                }
+
+                                //console.log(str);
+                            } else {
+                                duplicatesArr[str] = true;
+                            }
+                        });
+                        //console.log(approverArr)
+                        //console.log(duplicatesArr);
+                        if (flagDuplicate == 0) {
+                            //Approver detail duplicate validation
+                            var approverDetailArr = [];
+
+                            approverDetailArr.push($('#ddlApproverDetail1 option:selected').text());
+                            approverDetailArr.push($('#ddlApproverDetail2 option:selected').text());
+                            approverDetailArr.push($('#ddlApproverDetail3 option:selected').text());
+                            approverDetailArr.push($('#ddlApproverDetail4 option:selected').text());
+
+                            var flag = 0;
+
+                            var duplicates = {};
+
+                            approverDetailArr.forEach(function(str) {
+                                if (duplicates[str]) {
+                                    if (str != '-') {
+                                        flag = 1;
+                                        Swal.fire({
+                                            title: "Error!",
+                                            text: "Approver Detail tidak boleh sama!",
+                                            type: "error",
+                                            showConfirmButton: false,
+                                            timer: 2000
+                                        });
+                                    }
+                                           
+                                    console.log(str);
+                                } else {
+                                    duplicates[str] = true;
+                                }
+                            });
+
+                            if (flag == 0) {
+                                validationSubmitTO();
+                            }
+                        }
+                        
+                    }
+                            
+                }
+        });
+    });
+
+    function validationSubmitTO() {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "User yang dipilih akan menjadi Approver!",
+            type: "warning",
+            showConfirmButton: true
+        }).then((result) => {
+            if (result.value) {
+                waktu = new Date().toLocaleString('en-GB');
+                submitMappingTO();
+                        
+                $('#btnSubmitMapping').attr('disabled', true);
+                $('#ddlNoSPB').attr('disabled', true);
+                $('#ddlApprover1').attr('disabled', true);
+                $('#ddlApprover2').attr('disabled', true);
+                $('#ddlApproverDetail1').attr('disabled', true);
+                $('#ddlApproverDetail2').attr('disabled', true);
+                $('#ddlApproverDetail3').attr('disabled', true);
+                $('#ddlApproverDetail4').attr('disabled', true);
+                $('#ddlChoose').attr('disabled', true);
+                $('#txtRegion').attr('disabled', true);
+                $('#txtRemarks').attr('disabled', true);
+                $('#ddlNoTO').attr('disabled', true);
+            }
+        });
+    }
+
+    function validationSubmitSPB() {
+        Swal.fire({
+            title: "Are you sure?",
+            text: "User yang dipilih akan menjadi Approver!",
+            type: "warning",
+            showConfirmButton: true
+        }).then((result) => {
+            if (result.value) {
+                waktu = new Date().toLocaleString('en-GB');
+                submitMappingSPB();
+                                                        
+                $('#btnSubmitMapping').attr('disabled', true);
+                $('#ddlNoSPB').attr('disabled', true);
+                $('#ddlApprover1').attr('disabled', true);
+                $('#ddlApprover2').attr('disabled', true);
+                $('#ddlApproverDetail1').attr('disabled', true);
+                $('#ddlApproverDetail2').attr('disabled', true);
+                $('#ddlApproverDetail3').attr('disabled', true);
+                $('#ddlApproverDetail4').attr('disabled', true);
+                $('#ddlChoose').attr('disabled', true);
+                $('#ddlNoTO').attr('disabled', true);
+            }
+        });
+    }
+
+    function getNoSPB() {
+        var dictlist = {
+            Option: "Get Nomor SPB",
+        }
+
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+
+                var result = JSON.parse(data);
+                $.each(result, function (key, value) {
+                    $('#ddlNoSPB').append(new Option(value.NoSPB));
+                });
+
+               // console.log(result);
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function getApproverDDL() {
+        var dictlist = {
+            Option: "Get Approver DDL"
+        }
+
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+
+                var result = JSON.parse(data);
+                $.each(result, function (key, value) {
+                    $('#ddlApprover1').append(new Option(value.NamaEmployee, value.EmailEmployee));
+                    $('#ddlApprover2').append(new Option(value.NamaEmployee, value.EmailEmployee));
+                    $('#ddlApproverDetail1').append(new Option(value.NamaEmployee, value.EmailEmployee));
+                    $('#ddlApproverDetail2').append(new Option(value.NamaEmployee, value.EmailEmployee));
+                    $('#ddlApproverDetail3').append(new Option(value.NamaEmployee, value.EmailEmployee));
+                    $('#ddlApproverDetail4').append(new Option(value.NamaEmployee, value.EmailEmployee));
+                });
+
+                //console.log(result);
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function getJabatan(approveNo) {
+        var namaEmployee = ' ';
+
+        if (approveNo == 1) {
+            namaEmployee = $('#ddlApprover1 option:selected').text();
+        }
+        else if (approveNo == 2) {
+            namaEmployee = $('#ddlApprover2 option:selected').text();
+        }
+        else if (approveNo == 5) {
+            namaEmployee = $('#ddlApproverDetail1 option:selected').text();
+        }
+        else if (approveNo == 6) {
+            namaEmployee = $('#ddlApproverDetail2 option:selected').text();
+        }
+        else if (approveNo == 7) {
+            namaEmployee = $('#ddlApproverDetail3 option:selected').text();
+        }
+        else if (approveNo == 8) {
+            namaEmployee = $('#ddlApproverDetail4 option:selected').text();
+        }
+
+        var dictlist = {
+            Option: "Get Jabatan",
+            NamaEmployee: namaEmployee
+        }
+
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+
+                if (approveNo == 1) {
+                    $('#txtJabatan1').val(result[0].JobTtlName);
+                }
+                else if (approveNo == 2) {
+                    $('#txtJabatan2').val(result[0].JobTtlName);
+                }
+                else if (approveNo == 5) {
+                    $('#txtJabatanDetail1').val(result[0].JobTtlName);
+                }
+                else if (approveNo == 6) {
+                    $('#txtJabatanDetail2').val(result[0].JobTtlName);
+                }
+                else if (approveNo == 7) {
+                    $('#txtJabatanDetail3').val(result[0].JobTtlName);
+                }
+                else if (approveNo == 8) {
+                    $('#txtJabatanDetail4').val(result[0].JobTtlName);
+                }
+               
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function getApproverData() {
+     
+        var dictlist = {
+            Option: "Get Approver Data"
+        }
+
+        var dto = {
+            Model: dictlist
+        }
+
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+
+                $('#txtApprover3').val(result[0].Approver2);
+                $('#txtJabatan3').val(result[0].JobTtlName2);
+                $('#txtEmail3').val(result[0].Email2);
+                $('#txtApprover4').val(result[0].Approver3);
+                $('#txtJabatan4').val(result[0].JobTtlName3);
+                $('#txtEmail4').val(result[0].Email3);
+
+                @*if ($('#ddlChoose').val() == 'TO') {
+                    $('#txtApproverDetail').val(result[0].ApproverDetailTO);
+                    $('#txtJabatanDetail').val(result[0].JobTtlDetailTO);
+                }
+                else if ($('#ddlChoose').val() == 'SPB') {
+                    $('#txtApproverDetail').val(result[0].ApproverDetailSPB);
+                    $('#txtJabatanDetail').val(result[0].JobTtlDetailSPB);
+                }*@
+
+                //console.log(result);
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function submitMappingSPB() {
+        var email = null;
+        if ($('#ddlApprover1 option:selected').text() == '-') {
+            email = $('#txtEmail3').val();
+        } else {
+            email = $('#ddlApprover1').val();
+        }
+        var dto = {
+            Option: "Submit Mapping SPB",
+            NoSPB: $('#ddlNoSPB option:selected').text(),
+            Approver1: $('#ddlApprover1 option:selected').text(),
+            Approver2: $('#ddlApprover2 option:selected').text(),
+            //Approver3: $('#txtApprover3').val(),
+            //Approver4: $('#txtApprover4').val(),
+            Approver3: '-',
+            Approver4: '-',
+            ApproverDetail1: $('#ddlApproverDetail1 option:selected').text(),
+            ApproverDetail2: $('#ddlApproverDetail2 option:selected').text(),
+            ApproverDetail3: $('#ddlApproverDetail3 option:selected').text(),
+            ApproverDetail4: $('#ddlApproverDetail4 option:selected').text(),
+            SubmitDate: waktu,
+            Email1: email,
+            Uploader: "@Request.RequestContext.HttpContext.Session["UserName"]"
+        } 
+       
+        $.ajax({
+            url: "SubmitMappingSPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                Swal.fire({
+                    title: "Success!",
+                    text: "Mapping Approver SPB Berhasil di Submit!",
+                    type: "success",
+                    showConfirmButton: false,
+                    timer: 3000
+                }).then((result) => {
+                    location.reload();
+                });
+                //console.log(result);
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function submitMappingTO() {
+        var email = null;
+        if ($('#ddlApprover1 option:selected').text() == '-') {
+            email = $('#txtEmail3').val();
+        } else {
+            email = $('#ddlApprover1').val();
+        }
+
+        var dto = {
+            Option: "Submit Mapping TO",
+            NoTO: $('#ddlNoTO option:selected').text(),
+            Approver1: $('#ddlApprover1 option:selected').text(),
+            Approver2: $('#ddlApprover2 option:selected').text(),
+            //Approver3: $('#txtApprover3').val(),
+            //Approver4: $('#txtApprover4').val(),
+
+            Approver3: '-',
+            Approver4: '-',
+            ApproverDetail1: $('#ddlApproverDetail1 option:selected').text(),
+            ApproverDetail2: $('#ddlApproverDetail2 option:selected').text(),
+            ApproverDetail3: $('#ddlApproverDetail3 option:selected').text(),
+            ApproverDetail4: $('#ddlApproverDetail4 option:selected').text(),
+            Region: $('#txtRegion').val(),
+            Remarks: $('#txtRemarks').val(),
+            SubmitDate: waktu,
+            Email1: email,
+            Uploader: "@Request.RequestContext.HttpContext.Session["UserName"]"
+        }
+        $.ajax({
+            url: "SubmitMappingTO",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                Swal.fire({
+                    title: "Success!",
+                    text: "Mapping Approver TO Berhasil di Submit!",
+                    type: "success",
+                    showConfirmButton: false,
+                    timer: 3000
+                }).then((result) => {
+                    location.reload();
+                });
+               
+               // console.log(result);
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+
+    function clearDDL() {
+        $('#txtJabatan').val('');
+        $('#ddlNoSPB').val('').change();
+        $('#ddlApprover1').val('1').change();
+        $('#ddlApprover2').val('2').change();
+        $('#ddlNoTO').val('').change();
+        $('#ddlApproverDetail1').val('5').change();
+        $('#ddlApproverDetail2').val('6').change();
+        $('#ddlApproverDetail3').val('7').change();
+        $('#ddlApproverDetail4').val('8').change();
+    }
+
+    function getNoTO() {
+        var dictlist = {
+            Option: "Get Nomor TO",
+        }
+
+        var dto = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_Signature",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+
+                var result = JSON.parse(data);
+                $.each(result, function (key, value) {
+                    $('#ddlNoTO').append(new Option(value.NoTO));
+                });
+
+               // console.log(result);
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+
+</script>
+
+
+

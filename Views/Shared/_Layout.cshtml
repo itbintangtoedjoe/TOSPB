@@ -1,0 +1,328 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Create to PA APPS</title>
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="~/Content/images/IconB7.png">
+    <!-- Custom Stylesheet -->
+    <link href="~/Content/css/style.css" rel="stylesheet" />
+    <script src="~/Content/plugins/sweetalert2/dist/sweetalert2.min.js"></script>
+    <link href="~/Content/plugins/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet" />
+    <link href="~/Content/plugins/tables/css/datatable/dataTables.bootstrap4.min.css" rel="stylesheet">
+    <link href="~/Content/plugins/select2/css/select2.min.css" rel="stylesheet" />
+    <script src="~/Content/js/jquery.min.js"></script>
+    <link rel="stylesheet" href=" https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap.css">
+    @*<link rel="stylesheet" href="~/Content/js/bootstrap.css" />*@
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap4.min.css">
+    @*<link rel="stylesheet" href="~/Content/js/dataTables.bootstrap4.min.css">*@
+     <script src="https://kit.fontawesome.com/0507c93dbe.js" crossorigin="anonymous"></script>
+    @*<script src="~/Content/js/0507c93dbe.js" crossorigin="anonymous"></script>*@
+
+</head>
+<body style="background: #E9ECEF">
+
+    <!--*******************
+        Preloader start
+    ********************-->
+    <div id="preloader">
+        <div class="loader">
+            <svg class="circular" viewBox="25 25 50 50">
+                <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="3" stroke-miterlimit="10" />
+            </svg>
+        </div>
+    </div>
+    <!--*******************
+        Preloader end
+    ********************-->
+    <!--**********************************
+        Main wrapper start
+    ***********************************-->
+    <div id="main-wrapper">
+
+        <!--**********************************
+            Nav header start
+        ***********************************-->
+        <div class="nav-header">
+            <div class="brand-logo">
+                <a style="background: white" href="../ConvertToPA/HomePage">
+                    <img src="~/Content/images/LogoB7.png" style="width:90%;height:90%;"/>
+                </a>
+            </div>
+        </div>
+        <!--**********************************
+            Nav header end
+        ***********************************-->
+        <!--**********************************
+            Header start
+        ***********************************-->
+       @* <div class="header">
+            <div class="header-content clearfix">
+
+                <div class="nav-control">
+                    <div class="hamburger">
+                        <span class="toggle-icon"><i class="icon-menu"></i></span>
+                    </div>
+                </div>
+                <div class="header-left">
+                    <div class="input-group icons">
+                        <div class="drop-down   d-md-none">
+                            <form action="#">
+                                <input type="text" class="form-control" placeholder="Search">
+                            </form>
+                        </div>
+                    </div>
+                
+                </div>
+                <div class="header-right">
+                    <ul class="clearfix">
+                        <li class="icons dropdown">
+                            <b id="txtUsername" style="margin-right: 10px"></b>
+                            <div class="user-img c-pointer position-relative" data-toggle="dropdown">
+                                <span class="activity active"></span>
+                                <img src="~/Content/images/IconB7.png" height="40" width="40" alt="">
+                            </div>
+                            <div class="drop-down dropdown-profile   dropdown-menu">
+                                <div class="dropdown-content-body">
+                                    <ul>
+                                        <li><a href="/Login/index"><i class="icon-key"></i> <span>Logout</span></a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>*@
+        <!--**********************************
+            Header end ti-comment-alt
+        ***********************************-->
+        <!--**********************************
+            Sidebar start
+        ***********************************-->
+        <div class="nk-sidebar" style="margin-top: 20px">
+           <br/>
+            <h5 id="txtRole" style="color: #7cc343; text-align: center">APPROVER</h5>
+           <h6 id="txtUsernameSidebar" style=" text-align: center"><b>Username</b></h6>
+            <br/>
+
+            <div class="nk-nav-scroll">
+                <ul class="metismenu" id="menu">
+                    <li id="uploadMemo" hidden>
+                        <a href="https://portal.bintang7.com/ToSPBUpload/UploadMemo/UploadMemoProcess" target="_blank" aria-expanded="false">
+                            <i class="fa-solid fa-file-pen"></i><span class="nav-text">Upload Memo</span>
+                        </a>
+                    </li>
+                    <li id="reportMemo" hidden>
+                        <a href="http://b7-dc1dberp/Reports/Pages/Report.aspx?ItemPath=%2fIntranet-Reports%2fSubdist%2fFINSUB%2fMemoTO" aria-expanded="false">
+                            <i class="icon-note menu-icon"></i><span class="nav-text">Report Memo</span>
+                        </a>
+                    </li>
+                    <li id="reportLampiranMemo" hidden>
+                        <a href="http://b7-dc1dberp/Reports/Pages/Report.aspx?ItemPath=%2fIntranet-Reports%2fSubdist%2fFINSUB%2fLampiranMemoTo" aria-expanded="false">
+                            <i class="icon-note menu-icon"></i><span class="nav-text">Report Lampiran Memo</span>
+                        </a>
+                    </li>
+
+                    <li id="MappingApproval" hidden>
+                        <a href="~/CMS/MappingApprover" aria-expanded="false">
+                            <i class="fa-solid fa-file-signature"></i><span class="nav-text">Mapping Approver</span>
+                        </a>
+                    </li>
+                    <li id="uploadSignature" hidden>
+                        <a href="~/CMS/CMS_Signature" aria-expanded="false">
+                            <i class="fa-solid fa-signature"></i><span class="nav-text">Upload Signature</span>
+                        </a>
+                    </li>
+                    <li id="SPBList" hidden>
+                        <a href="~/CMS/CMS_SPBList" aria-expanded="false">
+                            <i class="fa-solid fa-clipboard-list"></i><span class="nav-text">SPB List</span>
+                        </a>
+                    </li>
+                    <li id="TOList">
+                        <a href="~/CMS/CMS_TOList" aria-expanded="false">
+                            <i class="fa-solid fa-clipboard-list"></i><span class="nav-text">TO List</span>
+                        </a>
+                    </li>
+                    <li id="SPBApproval" hidden>
+                        <a href="~/CMS/CMS_SPBApproval" aria-expanded="false">
+                            <i class="fa-solid fa-pen-to-square"></i><span class="nav-text">SPB Approval</span>
+                        </a>
+                    </li>
+                    <li id="TOApproval" hidden>
+                        <a href="~/CMS/CMS_TOApproval" aria-expanded="false">
+                            <i class="fa-solid fa-pen-to-square"></i><span class="nav-text">TO Approval</span>
+                        </a>
+                    </li>
+
+
+                    <li class="mega-menu mega-menu-sm" id="CreateToPA" hidden>
+                        <a href="~/ConvertToPA/CreateToPA" aria-expanded="false">
+                            <i class="icon-badge menu-icon"></i><span class="nav-text">Create to PA</span>
+                        </a>
+                    </li>
+
+                    <li hidden="hidden">
+                        <a href="~/ConvertToPA/EditMemo" aria-expanded="false">
+                            <i class="icon-note menu-icon"></i><span class="nav-text">Edit Memo</span>
+                        </a>
+                    </li>
+                    
+                    <li>
+                        <a href="../Login/Index">
+                            <i class="fa-solid fa-right-from-bracket"></i><span>Logout</span>
+                        </a>
+                    </li>
+                    @*<li>
+            <a class="has-arrow" href="javascript:void()" aria-expanded="false">
+                <i class="icon-graph menu-icon"></i> <span class="nav-text">Monitoring</span>
+            </a>
+            <ul aria-expanded="false">
+                <li><a href="~/Sosialisasi/index">Sosialisasi</a></li>
+                <li><a href="~/Penanaman/index">Penanaman</a></li>
+                <li><a href="~/Monitoring/index">Monitoring</a></li>
+                <li><a href="~/Panen/index">Panen</a></li>
+                <li><a href="~/MonitoringPascaPanen/index">Monitoring Pasca Panen</a></li>
+                <li><a href="~/Pengiriman/index">Pengiriman Simplisia</a></li>
+            </ul>
+        </li>
+        <li>
+            <a class="has-arrow" href="javascript:void()" aria-expanded="false">
+                <i class="icon-speedometer menu-icon"></i> <span class="nav-text">History</span>
+            </a>
+            <ul aria-expanded="false">
+                <li><a href="~/History/ApprovedList">Approved</a></li>
+                <li><a href="~/History/RejectList">Rejected</a></li>
+                <li><a href="~/AttachmentList/index">Attachment List</a></li>
+            </ul>
+        </li>*@
+
+
+
+                </ul>
+            </div>
+        </div>
+        <!--**********************************
+            Sidebar end
+        ***********************************-->
+        <!--**********************************
+            Content body start
+        ***********************************-->
+        <div class="app-content content">
+            <div class="content-wrapper">
+                <br />
+                <div class="content-body">
+                    @RenderBody()
+
+                    @Scripts.Render("~/bundles/jquery")
+                    @RenderSection("scripts", required: false)
+
+
+                </div>
+            </div>
+        </div>
+        <!--**********************************
+            Content body end
+        ***********************************-->
+        <!--**********************************
+            Footer start
+        ***********************************-->
+        <div class="footer">
+            <div class="copyright">
+                <p>Developed by PT Bintang Toedjoe 2022  </p>
+            </div>
+        </div>
+        <!--**********************************
+            Footer end
+        ***********************************-->
+    </div>
+    <!--**********************************
+        Main wrapper end
+    ***********************************-->
+    <!--**********************************
+        Scripts
+    ***********************************-->
+
+    <script src="~/Content/plugins/common/common.min.js"></script>
+    <script src="~/Content/js/custom.min.js"></script>
+    <script src="~/Content/js/settings.js"></script>
+    <script src="~/Content/js/gleek.js"></script>
+    <script src="~/Content/js/styleSwitcher.js"></script>
+    <script src="~/Content/plugins/tables/js/jquery.dataTables.min.js"></script>
+    <script src="~/Content/plugins/tables/js/datatable/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Content/plugins/tables/js/datatable-init/datatable-basic.min.js"></script>
+    <script src="~/Content/plugins/select2/js/select2.full.min.js"></script>
+
+</body>
+</html>
+
+<script>
+    $(document).ready(function () {
+        var role = "@Request.RequestContext.HttpContext.Session["Role"]"
+
+         @*alert(role)*@
+            $(document).ajaxError(function (a, xhr, c) {
+                console.log(xhr.status);
+                var status = xhr.status;
+                console.log(status);
+                if (xhr.status === 401) {
+                    chcksession(xhr.status);
+                }
+            });
+
+        if (role === "MKT") {
+            $('#txtRole').text('MARKETING');
+             $('#uploadMemo').attr('hidden', false);
+         @*    $('#reportMemo').attr('hidden', false);
+             $('#reportLampiranMemo').attr('hidden', false);*@
+            $('#uploadSignature').attr('hidden', false);
+            $('#SPBApproval').attr('hidden', false);
+            $('#TOApproval').attr('hidden', false);
+             $('#MappingApproval').attr('hidden', false);
+             $('#SPBList').attr('hidden', false);
+         }
+
+        else if (role === "FA") {
+            $('#txtRole').text('FINANCE');
+            $('#SPBList').attr('hidden', false);
+            $('#SPBApproval').attr('hidden', false);
+            $('#TOApproval').attr('hidden', false);
+             $('#CreateToPA').attr('hidden', false);
+         }
+
+        else if (role === "Signature") {
+            $('#txtRole').text('APPROVER');
+             $('#SPBApproval').attr('hidden', false);
+             $('#TOApproval').attr('hidden', false);
+             $('#SPBList').attr('hidden', false);
+         }
+
+        else if (role === "FINAR") {
+            $('#txtRole').text('FINAR');
+             $('#SPBList').attr('hidden', false);
+         }
+
+        $('#txtUsername').text("@Request.RequestContext.HttpContext.Session["Username"]");
+        $('#txtUsernameSidebar').text("@Request.RequestContext.HttpContext.Session["Username"]");
+
+
+     });
+
+
+        function chcksession(xhr) {
+             if (xhr === 401) {
+
+                   Swal.fire({
+                        title: 'Session Expired! Silahkan login Kembali.',
+                        type: "warning",
+                        showConfirmButton: false,
+                        timer: 3000,
+                        }).then(() => {
+                            return window.location.href = '../Login/Index';
+                        });
+                }
+        }
+
+</script>

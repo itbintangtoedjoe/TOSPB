@@ -1,0 +1,1822 @@
+﻿
+@{
+    ViewBag.Title = "CreateToPA";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script>
+    // Warning before leaving the page (back button, or outgoinglink)
+    window.onbeforeunload = function () {
+        return "Do you really want to leave our brilliant application?";
+        //if we return nothing here (just calling return;) then there will be no pop-up question at all
+        //return;
+    };
+    var totincome;
+    var budgetavail;
+    var unchckjmlh;
+    var chckjmlh;
+    var totbiayaspb;
+    var biayatamb = 0;
+    var biayapengur = 0;
+    var EO;
+    $(document).ready(function () {
+        InitialPage();
+        GetNoMemo();
+        GetListExpense();
+        getPeriode();
+        $('#Close_PA_SPB').click(function () {
+            Closed();
+        });
+        $('#Biaya_Tambahan_SPB').change(function () {
+            if ($('#Biaya_Tambahan_SPB').val() == '' || $('#Biaya_Tambahan_SPB').val() == null) {
+                biayatamb = 0;
+            }
+            CheckValue();
+        });
+        $('#Biaya_Tambahan_SPB').keyup(function () {
+            biayatamb = $('#Biaya_Tambahan_SPB').val();
+            //changetocurrency('Penambahan');
+            CheckValue();
+        });
+        $('#Biaya_Pengurangan_SPB').change(function () {
+            if ($('#Biaya_Pengurangan_SPB').val() == '' || $('#Biaya_Pengurangan_SPB').val() == null) {
+                biayapengur = 0
+            }
+            CheckValue();
+        });
+        $('#Biaya_Pengurangan_SPB').keyup(function () {
+
+            biayapengur = $('#Biaya_Pengurangan_SPB').val()
+            //changetocurrency('Pengurangan');
+            CheckValue();
+        });
+        $('#ddl_Periode_SPB').change(function () {
+            getSubdist();
+            getSubdistBuyer();
+
+            $('#tbl_SPB').DataTable().clear().destroy();
+            $("#ddl_SubBayar_SPB").attr("disabled", false);
+            //alert($('input[name="SB_Konfirm"]:checked').val());
+        });
+        $('#Tanggal_Cetak_SPB').change(function () {
+            var tanggal = $('#Tanggal_Cetak_SPB').val();
+            tanggalpembayaran(tanggal);
+            //alert($('input[name="SB_Konfirm"]:checked').val());
+        });
+        $('#ddl_SubBayar_SPB').change(function () {
+            //alert($('#ddl_SubBayar_SPB').val());
+            $('#ddl_Cabang_SPB').attr("disabled", false);
+            $('#ddl_SubBuyer_SPB').attr("disabled", false);
+            $('#ddl_ExpenseItem_SPB').attr("disabled", false);
+            gettotal();
+            getSubdistBuyer();
+            getSubdistStat();
+            getExpenseItem();
+            getListSPB();
+            getCabang();
+            //alert($('input[name="SB_Konfirm"]:checked').val());
+
+        });
+        $('#ddl_SubBuyer_SPB').change(function () {
+
+            getSaldoQP();
+
+        })
+        $('input[name="SB_Konfirm"]').change(function () {
+
+            if ($('input[name="SB_Konfirm"]:checked').val() == 'KONFIRM EO') {
+                $('#div_EO').removeAttr("hidden");
+            }
+            else {
+                $('#div_EO').attr("hidden", true);
+            }
+
+        })
+        $('#ddl_tipe_bayar').change(function () {
+            if ($('#ddl_tipe_bayar').val() == 'SPB') {
+                $('#CardSPB').attr('hidden', false);
+                $('#div_NoMemo').attr('hidden', true);
+            }
+            else {
+                $('#div_NoMemo').attr('hidden', false);
+                $('#CardSPB').attr('hidden', true);
+            }
+
+        });
+        $('#tbl_SPB tbody').on('click', 'input[id="chcbx_spb"]', function () {
+
+            checkspb(this);
+        })
+        $('#Create_PA_SPB').click(function () {
+
+            CreatePASPB()
+        });
+    });
+    $(document).ready(function () {
+        $('#txtNominalBayar').keyup(function () {
+            GetEndBudget();
+        });
+    });
+    $(document).ready(function () {
+        $("#ddl_memo").change(function () {
+            SubdistBayar();
+            LoadSaldoDetailPA();
+
+        });
+    });
+    $(document).ready(function () {
+        $("#ddl_subdist_bayar").change(function () {
+            GetTujuanSabdist();
+        });
+    });
+    $(document).ready(function () {
+        $("#ddl_tujuan_subdist").change(function () {
+            GetBudgetAvailable();
+        });
+    });
+    $(document).ready(function () {
+        $("#ddl_list_expense").change(function () {
+
+        });
+    });
+    $(document).ready(function () {
+        $("#btnAddDetail").click(function () {
+
+            $('#txtNoRek').attr('placeholder', 'Silahkan Isi Nomer Rekening');
+            $('#txtNoteRemarks').attr('placeholder', 'Silahkan Isi Note Remaks');
+            $('#txtNominalBayar').attr('placeholder', 'Silahkan Isi Nominal Tambahan');
+
+
+            var NoMemoSend = $("#ddl_memo").val();
+            var ShipToIDSend = $("#ddl_tujuan_subdistBayar").val();
+            var AmountSend = $("#txtNominalBayar").val();
+            var NoRekeningSend = $("#txtNoRek").val();
+            var NoteRemarksSend = $("#txtNoteRemarks").val();
+            var ListExpenseSend = $("#ddl_list_expense").val();
+            var LineNumberToSend = $("#ddl_tujuan_subdist").val();
+            var EndBudgetSend = $("#txtEndBudget").val();
+            var NamaBankSend = $("#txtBank").val();
+            var NamaRekeningSend = $("#txtNamaRek").val();
+            var SaldoPASubdist = $("#txtsaldoPA").val();
+            if (SaldoPASubdist < AmountSend) {
+                alert('Saldo anda tidak mencukupi');
+                return;
+            }
+            //alert(AmountSend);
+            $.ajax({
+                url: 'InsertAddDetail?NoMemo=' + NoMemoSend +
+                    "&ShipToID=" + ShipToIDSend +
+                    "&amount=" + AmountSend +
+                    "&NoRekening=" + NoRekeningSend +
+                    "&NoteRemarks=" + NoteRemarksSend +
+                    "&ListExpense=" + ListExpenseSend +
+                    "&LineNumberTo=" + LineNumberToSend +
+                    "&EndBudget=" + EndBudgetSend +
+                    "&NamaBank=" + NamaBankSend +
+                    "&NamaRekening=" + NamaRekeningSend,
+                type: 'post',
+                dataType: 'json',
+                contentType: 'application/json; charset=utf-8',
+                success: function (data) {
+                    $('#txtsaldoPA').val(data);
+                    LoadBtnCreateClosePA();
+
+                }, error: function (ex) {
+                    alert(JSON.stringify(ex));
+                }
+            });
+        });
+    });
+    $(document).ready(function () {
+        $("#ddl_tujuan_subdistBayar").change(function () {
+            GetSaldoPA();
+        });
+    });
+    $(document).ready(function () {
+        $("#btnCreatePA").click(function () {
+            InsertCreateToPA();
+        });
+    });
+    $(document).ready(function () {
+        $("#btnCloseSisaBayar").click(function () {
+            CloseSisaBayar();
+        });
+
+    });
+
+    function InitialPage() {
+        $('#CardDetailPA').attr('Hidden', true);
+        $('#formSaldo').attr('Hidden', true);
+        $('#formBtnCreateClosePA').attr('hidden', true);
+        $('#form_tablePA').attr('hidden', true);
+        $('#CardSPB').attr('hidden', true);
+        $('#div_EO').attr('hidden', true);
+    }
+    function LoadSaldoDetailPA() {
+        $('#CardDetailPA').attr('Hidden', false);
+        $('#formSaldo').attr('Hidden', false);
+        //GetSaldoPA();
+    }
+    function LoadBtnCreateClosePA() {
+        $('#formBtnCreateClosePA').attr('hidden', false);
+        $('#form_tablePA').attr('hidden', false);
+        var NoMemoSend = $("#ddl_memo").val();
+        var LineNumberToSend = $("#ddl_tujuan_subdist").val();
+
+        $.ajax({
+            url: "GetDetailTO?NoMemo=" + NoMemoSend + "&LineNumberTo=" + LineNumberToSend,
+            type: "post",
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var trHTML = '';
+                var trav = 0;
+                var Count = data.length;
+
+                for (trav = 0; trav < Count; trav++) {
+                    trHTML += '<tr><td>' + data[trav].No + '</td><td>' + data[trav].HeaderLineNumber + '</td><td>' + data[trav].ShiptoID + '</td><td>' + data[trav].Subdist + '</td><td>' + data[trav].Amount + '</td><td><button class="btn btn-primary" id=btnDeleteLevel onclick="Delete(this)">Delete</button></td >;</tr>';
+                }
+                if (Count > 0) {
+
+                }
+                $("#tBodyPA").empty();
+                $("#tblItemList").append(trHTML);
+
+            }
+        });
+    }
+    function BtnAddDetail() {
+        AddDetailClick();
+    }
+    function DisableAll() {
+        $('#Create_PA_SPB').attr("disabled", true);
+        $('#Close_PA_SPB').attr("disabled", true);
+        $('#ddl_Periode_SPB').attr("disabled", true);
+        $('#ddl_SubBayar_SPB').attr("disabled", true);
+        $('#ddl_Cabang_SPB').attr("disabled", true);
+        $('#ddl_SubBuyer_SPB').attr("disabled", true);
+        $('#Tanggal_Cetak_SPB').attr("disabled", true);
+        $('#ddl_ExpenseItem_SPB').attr("disabled", true);
+        $('#Biaya_Tambahan_SPB').attr("disabled", true);
+        $('#Ket_Tamb_SPB').attr("disabled", true);
+        $('#Biaya_Pengurangan_SPB').attr("disabled", true);
+        $('#Ket_Kurang_SPB').attr("disabled", true);
+    }
+    function ConfirmCreatePA() {
+        swal({
+            title: "Apakah Anda yakin untuk Create To PA ?",
+            text: "Pastikan Data Yang Anda inputkan Benar !",
+            type: "warning",
+            showCancelButton: !0,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Ya, Create To PA !!",
+            closeOnConfirm: !1
+        }, function () {
+            swal({
+                title: "Create To PA Berhasil !!",
+                text: "Anda Akan diarahkan ke Home",
+                type: "success",
+                timer: 2e3,
+                closeOnConfirm: !1
+
+            }, function () {
+                var url = "HomePage";
+                $(location).attr('href', url);
+            });
+        });
+    }
+    function ConfirmCloseSisa() {
+        swal({
+            title: "Apakah Anda yakin untuk Close Sisa Pembayaran ?",
+            text: "Pastikan Data Yang Anda inputkan Benar !",
+            type: "warning",
+            showCancelButton: !0,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Ya, Close Sisa Pembayaran!!",
+            closeOnConfirm: !1
+        }, function () {
+            swal({
+                title: "Close Sisa Pembayaran Berhasil !!",
+                text: "Anda Akan diarahkan ke Home",
+                type: "success",
+                timer: 2e3,
+                showConfirmButton: !1
+
+            }, function () {
+                var url = "HomePage";
+                $(location).attr('href', url);
+            });
+        });
+    }
+    /* Function */
+    function NotKopkarSelected() {
+        var SubdistBayarIDSend = $("#ddl_tujuan_subdistBayar").val();
+
+        $.ajax({
+            url: 'NotKopkarSelected?ShipToID=' + SubdistBayarIDSend,
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                $("#txtNamaRek").val(data);
+
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+    function GetNoMemo() {
+
+        $.ajax({
+            url: 'GetNoMemo',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                var count = data.length;
+                var trhtml = '';
+                var trav = 0;
+
+                trhtml += '<option disabled selected hidden class="dropdown-header">*** Pilih Nomer Memo ***</option>';
+                if (count > 0) {
+                    for (trav = 0; trav < count; trav++) {
+                        trhtml += '<Option class="dropdown-item" value = "' + data[trav] + '" > ' + data[trav];
+                    }
+                }
+                $("#ddl_memo").empty();
+                $("#ddl_memo").append(trhtml);
+                $("#ddl_memo").select2();
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+    function SubdistBayar() {
+        var NoMemoSend = $("#ddl_memo").val();
+        $.ajax({
+            url: 'GetTujuanSubdist?NoMemo=' + NoMemoSend,
+            type: 'post',
+            dataType: 'json',
+            //data: JSON.stringify(dto),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                var count = data.length;
+                var trhtml = '';
+                var trav = 0;
+
+                trhtml += '<option disabled selected hidden class="dropdown-header">*** Pilih Subdist Bayar ***</option>';
+                if (count > 0) {
+                    for (trav = 0; trav < count; trav++) {
+                        trhtml += '<Option class="dropdown-item" value = "' + data[trav].LineNumber + '" > ' + data[trav].Description;
+                    }
+                }
+                $("#ddl_tujuan_subdist").empty();
+                $("#ddl_tujuan_subdist").append(trhtml);
+                $("#ddl_tujuan_subdist").select2();
+
+                LoadSaldoDetailPA();
+
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+    function GetSaldoPA() {
+        var SubdistBayarIDSend = $("#ddl_tujuan_subdistBayar").val();
+
+        $.ajax({
+            url: 'GetSaldo?NoSubdist=' + SubdistBayarIDSend,
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                $('#txtsaldoPA').val(data[0].Saldo);
+                $('#txtsaldoPAShow').val(data[0].SaldoShow);
+                if (SubdistBayarIDSend != '595733') {
+                    NotKopkarSelected();
+                }
+
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+    function GetTujuanSabdist(ShipToID) {
+        var NoSubdistSend = ShipToID;
+        var NoMemoSend = $("#ddl_memo").val();
+
+        $.ajax({
+            url: 'GetTujuanSubdistBayar?NoSubdist=' + NoSubdistSend + "&NoMemo=" + NoMemoSend,
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                var count = data.length;
+                var trhtml = '';
+                var trav = 0;
+
+                trhtml += '<option disabled selected hidden class="dropdown-header">*** Silahkan Pilih Tujuan Subdist ***</option>';
+                if (count > 0) {
+                    for (trav = 0; trav < count; trav++) {
+                        trhtml += '<Option class="dropdown-item" value = "' + data[trav].ShipToID + '" > ' + data[trav].Description;
+                    }
+                }
+                $("#ddl_tujuan_subdistBayar").empty();
+                $("#ddl_tujuan_subdistBayar").append(trhtml);
+
+
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+    function GetBudgetAvailable() {
+        var NoMemoSend = $("#ddl_memo").val();
+        var LineNumberSend = $("#ddl_tujuan_subdist").val();
+
+
+        $.ajax({
+            url: 'GetBudgetAvailable?NoMemo=' + NoMemoSend + "&LineNumber=" + LineNumberSend,
+            type: 'post',
+            dataType: 'json',
+            //data: JSON.stringify(dto),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                $('#txtBudgetAvailable').val(data[0].KlaimTO);
+                $('#txtBudgetAvailableShow').val(data[0].KlaimTOShow);
+                GetTujuanSabdist(data[0].ShipToID);
+
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+    function GetListExpense() {
+
+        $.ajax({
+            url: 'GetItemExpense',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                var count = data.length;
+                var trhtml = '';
+                var trav = 0;
+
+                trhtml += '<option disabled selected hidden class="dropdown-header">*** Silahkan Pilih List Expense ***</option>';
+                if (count > 0) {
+                    for (trav = 0; trav < count; trav++) {
+                        trhtml += '<Option class="dropdown-item" value = "' + data[trav].IdExpense + '" > ' + data[trav].DescExpense;
+                    }
+                }
+                $("#ddl_list_expense").empty();
+                $("#ddl_list_expense").append(trhtml);
+
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+    function GetEndBudget() {
+        var t_avail = parseInt($('#txtBudgetAvailable').val());
+        var t_nominalBayar = parseInt($('#txtNominalBayar').val());
+
+        var t_endBudget = t_avail - t_nominalBayar;
+
+        $('#txtEndBudget').val(t_endBudget);
+    }
+    /* Function Insert */
+    function InsertCreateToPA() {
+        var NoMemoSend = $("#ddl_memo").val();
+        var LineNumberSend = $("#ddl_tujuan_subdist").val();
+        var ShiptoIDSend = $("#ddl_tujuan_subdistBayar").val();
+
+
+        $.ajax({
+            url: 'CreateToPAExec?NoSubdist=' + ShiptoIDSend + '&LineNumber=' + LineNumberSend + '&NoMemo=' + NoMemoSend,
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                swal("Success", "Create To PA Berhasil dengan nomor :" + data, "success");
+                $("#txtNoPA").val(data);
+                $("#btnAddDetail").attr("disabled", true);
+                $("#btnCloseSisaBayar").attr("disabled", true);
+                $("#btnCreatePA").attr("disabled", true);
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+    function CloseSisaBayar() {
+        var NoMemoSend = $("#ddl_memo").val();
+        var LineNumberSend = $("#ddl_tujuan_subdist").val();
+
+        $.ajax({
+            url: 'CloseExec?NoMemo=' + NoMemoSend + '&LineNumber=' + LineNumberSend,
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                swal({
+                    title: "Close Sisa bayar berhasil",
+                    text: "Anda Akan diarahkan ke Home",
+                    type: "success",
+                    timer: 2e3,
+                    showConfirmButton: !1
+
+                }, function () {
+                    var url = "HomePage";
+                    $(location).attr('href', url);
+                });
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+    function Delete(button) {
+        var row = $(button).closest("TR");
+        var HeadLNSend = $("TD", row).eq(1).html();
+        var NoMemoSend = $("#ddl_memo").val();
+        console.log(HeadLNSend);
+
+        $.ajax({
+            url: "DeleteLineTOSLA?NoMemo=" + NoMemoSend + "&HeadLineNumber=" + HeadLNSend,
+            type: "post",
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var trHTML = '';
+                var trav = 0;
+                var Count = data.length;
+
+                for (trav = 0; trav < Count; trav++) {
+                    trHTML += '<tr><td>' + data[trav].No + '</td><td>' + data[trav].HeaderLineNumber + '</td><td>' + data[trav].ShiptoID + '</td><td>' + data[trav].Subdist + '</td><td>' + data[trav].Amount + '</td><td><button class="btn btn-primary" id=btnDeleteLevel onclick="Delete(this)">Delete</button></td >;</tr>';
+                }
+                if (Count > 0) {
+
+                }
+                $("#tBodyPA").empty();
+                $("#tblItemList").append(trHTML);
+            },
+            error: function (errormessage) {
+            }
+        });
+    }
+    function getPeriode() {
+
+        var dictlist = {
+            Option: 1
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                var Count = result.length;
+                var trHTML = '';
+                trHTML += '<option disabled selected hidden class="dropdown-header" value="-">--Please Select--</option>';
+                var trav = 0;
+                if (Count > 0) {
+                    for (trav = 0; trav < Count; trav++) {
+                        trHTML += '<Option value="' + result[trav].PERIODSPB + '">' + result[trav].PERIODSPB;
+                    }
+                }
+
+                $("#ddl_Periode_SPB").empty();
+                $("#ddl_Periode_SPB").append(trHTML);
+                $('#ddl_Periode_SPB').select2()
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+    }
+    function getSubdist() {
+
+        var dictlist = {
+            Option: 2,
+            Period: $('#ddl_Periode_SPB').val()
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                var Count = result.length;
+                var trHTML = '';
+                trHTML += '<option disabled selected hidden class="dropdown-header" value="-">--Please Select--</option>';
+                var trav = 0;
+                if (Count > 0) {
+                    for (trav = 0; trav < Count; trav++) {
+                        trHTML += '<Option value="' + result[trav].SUBDISTBAYAR + ' || ' + result[trav].KOTASUBDIST+ '">' + result[trav].SUBDISTBAYAR + ' || ' + result[trav].KOTASUBDIST;
+                    }
+                }
+
+                $("#ddl_SubBayar_SPB").empty();
+                $("#ddl_SubBayar_SPB").append(trHTML);
+                $('#ddl_SubBayar_SPB').select2();
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+    }
+
+    function gettotal() {
+        var dictlist = {
+            Option: 3,
+            Period: $("#ddl_Periode_SPB").val(),
+            KodeSubdist: $('#ddl_SubBayar_SPB').val()
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                $('#txtBudgetSPB').val('RP. ' + result[0].TotalRupiah)
+                totincome = result[0].Total;
+
+                CheckValue();
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+
+    }
+    function getSubdistStat() {
+        var dictlist = {
+            Option: 6,
+            Period: $("#ddl_Periode_SPB").val(),
+            KodeSubdist: $('#ddl_SubBayar_SPB').val()
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                var statussubdist = result[0].StatusSubdistBuyer;
+                var cabang = result[0].CAB;
+                if (result[0].NOEO != '' && result[0].StatusSubdistBuyer == 'KONFIRM EO') {
+                    statussubdist = 'KONFIRM EO'
+                    cabang = 'HO'
+                    GetListEO(result[0].NOEO);
+                    $('input[id="Konfirm_EO"]').prop('checked', true)
+                    $('#div_List_EO').attr("hidden", false);
+                }
+                else {
+                    $('input[name="SB_Konfirm"][value="' + statussubdist + '"]').prop('checked', true)
+
+                    $('#Txt_Nama_EO').val('');
+
+                }
+                //$('input[name="SB_Konfirm"][value=' + statussubdist + ']').prop('checked', true);
+                
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+
+    }
+
+    function GetListEO(NoEO) {
+        var dictlist = {
+            Option: 4,
+            NoEO: NoEO
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                $('#Txt_Nama_EO').val(result[0].NamaEO + ' || ' + result[0].BankEO);
+                EO = NoEO;
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+    }
+    function getCabang() {
+
+        var dictlist = {
+            Option: 7,
+            Period: $('#ddl_Periode_SPB').val(),
+            KodeSubdist: $('#ddl_SubBayar_SPB').val()
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                console.log(data);
+                var result = JSON.parse(data);
+                var Count = result.length;
+                var trHTML = '';
+                trHTML += '<option disabled selected hidden class="dropdown-header" value="-">--Please Select--</option>';
+                var trav = 0;
+                if (Count > 0) {
+                    for (trav = 0; trav < Count; trav++) {
+                        trHTML += '<Option value="' + result[trav].KodeCabang + '">' + result[trav].Cabang;
+                    }
+                }
+
+                $("#ddl_Cabang_SPB").empty();
+                $("#ddl_Cabang_SPB").append(trHTML);
+                $('#ddl_Cabang_SPB').select2();
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+    }
+    function getSubdistBuyer() {
+        var dictlist = {
+            Option: 8,
+            Period: $('#ddl_Periode_SPB').val(),
+            KodeSubdist: $("#ddl_SubBayar_SPB").val()
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                var Count = result.length;
+                var trHTML = '';
+                trHTML += '<option disabled selected hidden class="dropdown-header" value="-">--Please Select--</option>';
+                var trav = 0;
+                if (Count > 0) {
+                    for (trav = 0; trav < Count; trav++) {
+                        trHTML += '<Option value="' + result[trav].KodeSubDist + '">' + result[trav].SubdistDisplay;
+                    }
+                }
+
+                $("#ddl_SubBuyer_SPB").empty();
+                $("#ddl_SubBuyer_SPB").append(trHTML);
+                $('#ddl_SubBuyer_SPB').select2();
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+    }
+    function getExpenseItem() {
+        var dictlist = {
+            Option: 9,
+            KodeSubdist: $("#ddl_SubBayar_SPB").val()
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                console.log(result);
+                var Count = result.length;
+                var trHTML = '';
+                trHTML += '<option disabled selected hidden class="dropdown-header" value="-">--Please Select--</option>';
+                var trav = 0;
+                if (Count > 0) {
+                    for (trav = 0; trav < Count; trav++) {
+                        trHTML += '<Option value="' + result[trav].ExpenseCode + ' || ' + result[trav].ExpenseItem + '">' + result[trav].ExpenseItemName;
+                    }
+                }
+
+                $("#ddl_ExpenseItem_SPB").empty();
+                $("#ddl_ExpenseItem_SPB").append(trHTML);
+                $('#ddl_ExpenseItem_SPB').select2();
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+    }
+    function getSaldoQP() {
+        var dictlist = {
+            Option: 10,
+            KodeSubdist: $("#ddl_SubBuyer_SPB").val()
+        }
+        /* alert($("#ddl_SubBuyer_SPB").val());*/
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                console.log(result);
+                if (result.length > 0) {
+                    if (result[0].Saldo < 1) {
+                        $('#txt_BudgetAvail_SPB').val('Budget tidak Mencukupi');
+                    }
+                    else {
+
+                        $('#txt_BudgetAvail_SPB').val('RP. ' + result[0].SaldoQP);
+                    }
+                    budgetavail = result[0].Saldo;
+                }
+
+
+                CheckValue();
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+    }
+    //function changetocurrency(amount) {
+    //    var biaya;
+    //    if (amount == 'Penambahan') {
+    //        biaya = $('#Biaya_Tambahan_SPB').val();
+    //        var currbiaya = parseInt(biaya);
+    //        var currency = currbiaya.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")
+    //        $('#Biaya_Tambahan_SPB').val(currency);
+    //    }
+    //    else {
+    //        biaya = $('#Biaya_Pengurangan_SPB').val();
+    //        var currency = biaya.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,")
+    //        $('#Biaya_Pengurangan_SPB').val(currency);
+    //    }
+    //}
+    function CheckValue() {
+        if ($('#txtBudgetSPB').val() != '') {
+            if ($('#Biaya_Pengurangan_SPB').val() > totincome) {
+                swal({
+                    title: "Error!",
+                    text: "Biaya Pengurangan tidak boleh melebihi amount SPB! ",
+                    type: "error",
+                    showConfirmButton: false,
+                    timer: 1000,
+                });
+                $('#Biaya_Pengurangan_SPB').val('');
+                biayapengur = 0;
+            }
+            var tambahkurang;
+
+            tambahkurang = biayatamb - biayapengur;
+            //- $('#Biaya_Tambahan_SPB').val() + $('#Biaya_Pengurangan_SPB').val()
+            totbiayaspb = totincome + tambahkurang;
+
+            var akhir = "RP. " + totbiayaspb.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+            console.log(totincome);
+            $('#txtTotBiayaSPB').val(akhir);
+        }
+    }
+    function getListSPB() {
+        $('#form_tableSPB').removeAttr('hidden');
+
+        var dictlist = {
+            Option: 11,
+            Period: $("#ddl_Periode_SPB").val(),
+            KodeSubdist: $('#ddl_SubBayar_SPB').val()
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto1),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                var table = $('#tbl_SPB').DataTable({
+                    "pageLength": 50,
+                    "data": JSON.parse(data),
+                    "language": {
+                        "search": "_INPUT_",
+                        "searchPlaceholder": "Search...",
+                        "searchBorder": "1px solid black",
+                    },
+                    "filter": true,
+                    "lengthChange": true,
+                    "paging": true,
+                    "info": true,
+                    "searching": true,
+                    "select": true,
+                    "bDestroy": true,
+                    "scrollCollapse": true,
+                    "columns": [
+                        {
+                            "data": null,
+                            "defaultContent": "<input class='selected' id='chcbx_spb' type='checkbox' checked='checked'/>"
+                        },
+                        { "data": "ID" },
+                        { "data": "PERIODSPB" },
+                        { "data": "REG" },
+                        { "data": "BANK" },
+                        { "data": "NOKTP" },
+                        { "data": "NOMORREKENING" },
+                        { "data": "NAMATEAM" },
+                        { "data": "NOSURAT" },
+                        { "data": "TOT_INCOME" },
+                        { "data": "TOTAL_INCOME" },
+                    ],
+                    "columnDefs": [
+                        {
+                            "targets": [1],
+                            "visible": false,
+                            "searchable": false
+                        },
+                        {
+                            "targets": [10],
+                            "visible": false,
+                            "searchable": false
+                        }
+                    ],
+                    "order": [[1, 'asc']],
+                });
+            },
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+
+    }
+    function checkspb(button) {
+        var row = $(button).closest("TR");
+        var data = $('#tbl_SPB').DataTable().row(row).data();
+        var jmlh = data['TOTAL_INCOME'];
+        console.log(jmlh);
+        if (button.checked == false) {
+            totincome -= jmlh
+        }
+        else {
+            totincome += jmlh
+        }
+        var akhir = "RP. " + totincome.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, "$&,");
+        $('#txtBudgetSPB').val(akhir);
+        CheckValue();
+    }
+    function CreatePASPB() {
+        if ($('input[name="SB_Konfirm"]:checked').val() == 'NOT KONFIRM') {
+            var Jsonobj = [];
+            var status = false;
+            var table = $('#tbl_SPB').DataTable();
+            for (var i = 0; i < table.data().count(); i++) {
+
+                var row = table.row(i);
+                var tr = $(row.node());
+                var checkbox = tr.find('td:first-child input[type="checkbox"]')
+                // Mengecheck Checkbox apakah sudah di checklist
+                if (checkbox.is(':checked')) {
+                    var data = row.data();
+                    var item = {};
+                    item["ID"] = data['ID']
+                    item["PERIODSPB"] = data['PERIODSPB'];
+                    item["REG"] = data['REG']
+                    item["BANK"] = data['BANK']
+                    item["NOKTP"] = data['NOKTP']
+                    item["NOMORREKENING"] = data['NOMORREKENING'];
+                    item["NAMATEAM"] = data['NAMATEAM']
+                    item["NOSURAT"] = data['NOSURAT']
+                    item["TOTAL_INCOME"] = data['TOTAL_INCOME']
+                    Jsonobj.push(item);
+                    status = true;
+                }
+            }
+            if (status == true) {
+                var dictlist = {
+                    Option: 12,
+                    Period: $("#ddl_Periode_SPB").val(),
+                    KodeSubdist: $("#ddl_SubBayar_SPB").val(),
+                    Group_SBD: $("#ddl_SubBuyer_SPB").val(),
+                    NoEO: $('#Txt_Nama_EO').val(),
+                    TanggalCetak: $('#Tanggal_Cetak_SPB').val(),
+                    TanggalPembayaran: $('#Tanggal_Pembayaran_SPB').val(),
+                    Cabang: $('#ddl_Cabang_SPB').val(),
+                    Pengurangan: biayapengur,
+                    Penambahan: biayatamb,
+                    KetPengurangan: $('#Ket_Kurang_SPB').val(),
+                    KetPenambahan: $('#Ket_Tamb_SPB').val(),
+                    TotBiaya: totbiayaspb
+                }
+                var dto = {
+                    PaymentDetail: Jsonobj,
+                    Model: dictlist
+                }
+                var checklist = {
+                    Option: 12,
+                    Periode_PA: $("#ddl_Periode_SPB").val(),
+                    Subdist_Bayar: $("#ddl_SubBayar_SPB").val(),
+                    EO: EO,
+                    Cabang: $('#ddl_Cabang_SPB').val(),
+                    Subdist_Buyer: $("#ddl_SubBuyer_SPB").val(),
+                    Tanggal_Cetak: $('#Tanggal_Cetak_SPB').val(),
+                    Tanggal_Pembayaran: $('#Tanggal_Pembayaran_SPB').val(),
+                    Biaya_Tambahan: biayapengur,
+                    Biaya_Pengurangan: biayatamb,
+                    Ket_Pengurangan: $('#Ket_Kurang_SPB').val(),
+                    Ket_Penambahan: $('#Ket_Tamb_SPB').val(),
+                    Tot_Biaya: totbiayaspb
+                }
+                $.each(checklist, function (key, value) {
+
+                    if (key != 'EO' && (value == '' || value == null) && key != 'Tot_Biaya' && key != 'Biaya_Tambahan' && key != 'Biaya_Pengurangan'
+                        && key != 'Ket_Pengurangan' && key != 'Ket_Penambahan') {
+
+                        if (key.indexOf('_') > 0) {
+                            var keysplit = key.split('_');
+                            swal({
+                                title: "Warning!",
+                                text: "Silahakan melengkapi " + keysplit[0] + " " + keysplit[1] + " yang kosong terlebih dahulu",
+                                type: "warning",
+                                showConfirmButton: false,
+                                timer: 2000,
+                            });
+                            return valid = false;
+                        }
+                        else {
+                            swal({
+                                title: "Warning!",
+                                text: "Silahakan melengkapi " + key + " yang kosong terlebih dahulu",
+                                type: "warning",
+                                showConfirmButton: false,
+                                timer: 2000,
+                            });
+                            return valid = false;
+                        }
+
+                    }
+                    else if ((key == 'Biaya_Tambahan' || key == 'Biaya_Pengurangan') && value != 0) {
+                        if ((key == 'Ket_Pengurangan' || key == 'Ket_Penambahan') && (value == '' || value == null)) {
+                            if (key.indexOf('_') > 0) {
+                                var keysplit = key.split('_');
+                                swal({
+                                    title: "Warning!",
+                                    text: "Silahakan melengkapi " + keysplit[0] + " " + keysplit[1] + " yang kosong terlebih dahulu",
+                                    type: "warning",
+                                    showConfirmButton: false,
+                                    timer: 2000,
+                                });
+                                return valid = false;
+                            }
+                        }
+                    }
+                    else if (key == 'Tot_Biaya' && budgetavail < totbiayaspb) {
+                        swal({
+                            title: "Warning!",
+                            text: "Maaf Budget Anda Kurang dari Pengeluaran Anda",
+                            type: "warning",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        }); s
+                        return valid = false;
+                    }
+                    else {
+                        valid = true;
+                    }
+                });
+                if (valid == true) {
+                    $.ajax({
+                        url: "../UploadMemo/InsertPaymentDet",
+                        type: 'post',
+                        dataType: 'json',
+                        data: JSON.stringify(dto),
+                        contentType: 'application/json; charset=utf-8',
+                        success: function (data) {
+                            var result = JSON.parse(data)
+                            swal({
+                                title: "Success!",
+                                text: "No PA " + result[0].NoPA + " Berhasil di Generate",
+                                type: "success",
+                            });
+                            DisableAll();
+
+                            window.location.reload();
+                        },
+                        error: function (ex) {
+                            console.log(JSON.stringify(ex))
+                        }
+                    });
+                }
+               
+
+            }
+        }
+        else {
+            var dictlist = {
+                Option: 13,
+                Period: $("#ddl_Periode_SPB").val(),
+                KodeSubdist: $("#ddl_SubBayar_SPB").val(),
+                Group_SBD: $("#ddl_SubBuyer_SPB").val(),
+                NoEO: $('#Txt_Nama_EO').val(),
+                TanggalCetak: $('#Tanggal_Cetak_SPB').val(),
+                TanggalPembayaran: $('#Tanggal_Pembayaran_SPB').val(),
+                Cabang: $('#ddl_Cabang_SPB').val(),
+                Pengurangan: biayapengur,
+                Penambahan: biayatamb,
+                KetPengurangan: $('#Ket_Kurang_SPB').val(),
+                KetPenambahan: $('#Ket_Tamb_SPB').val(),
+                TotBiaya: totbiayaspb
+            }
+            var dto1 = {
+                Model: dictlist
+            }
+            var checklist = {
+                Option: 13,
+                Periode_PA: $("#ddl_Periode_SPB").val(),
+                Subdist_Bayar: $("#ddl_SubBayar_SPB").val(),
+                Cabang: $('#ddl_Cabang_SPB').val(),
+                Subdist_Buyer: $("#ddl_SubBuyer_SPB").val(),
+                EO: EO,
+                Tanggal_Cetak: $('#Tanggal_Cetak_SPB').val(),
+                Tanggal_Pembayaran: $('#Tanggal_Pembayaran_SPB').val(),
+                Biaya_Tambahan: biayapengur,
+                Biaya_Pengurangan: biayatamb,
+                Ket_Pengurangan: $('#Ket_Kurang_SPB').val(),
+                Ket_Penambahan: $('#Ket_Tamb_SPB').val(),
+                Tot_Biaya: totbiayaspb
+            }
+            var valid = false;
+            $.each(checklist, function (key, value) {
+
+                if (key != 'EO' && (value == '' || value == null) && key != 'Tot_Biaya' && key != 'Biaya_Tambahan' && key != 'Biaya_Pengurangan'
+                    && key != 'Ket_Pengurangan' && key != 'Ket_Penambahan') {
+                   
+                    if (key.indexOf('_') > 0) {
+                        var keysplit = key.split('_');
+
+                        swal({
+                            title: "Warning!",
+                            text: "Silahakan melengkapi " + keysplit[0] + " " + keysplit[1] + " yang kosong terlebih dahulu",
+                            type: "warning",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        });
+                        return  valid = false;
+                    }
+                    else {
+                        swal({
+                            title: "Warning!",
+                            text: "Silahakan melengkapi " + key + " yang kosong terlebih dahulu",
+                            type: "warning",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        });
+                        return  valid = false;
+                    }
+
+                }
+                else if ((key == 'Biaya_Tambahan' || key == 'Biaya_Pengurangan') && value != 0   )
+                {
+                    if ((key == 'Ket_Pengurangan' || key == 'Ket_Penambahan') && (value == '' || value == null)) {
+                        if (key.indexOf('_') > 0) {
+                            var keysplit = key.split('_');
+                            swal({
+                                title: "Warning!",
+                                text: "Silahakan melengkapi " + keysplit[0] + " " + keysplit[1] + " yang kosong terlebih dahulu",
+                                type: "warning",
+                                showConfirmButton: false,
+                                timer: 2000,
+                            });
+                            return valid = false;
+                        }
+                    }
+                }
+                else if (key == 'Tot_Biaya' && budgetavail < totbiayaspb) {
+                    swal({
+                        title: "Warning!",
+                        text: "Maaf Budget Anda Kurang dari Pengeluaran Anda",
+                        type: "warning",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });s
+                    return valid = false;
+                }
+                else {
+                    valid = true;
+                }
+            });
+            if (valid == true) {
+                $.ajax({
+                    url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+                    type: "post",
+                    dataType: "json",
+                    data: JSON.stringify(dto1),
+                    contentType: "application/json;charset=utf-8",
+                    success: function (data) {
+                        var result = JSON.parse(data);
+                        swal({
+                            title: "Success!",
+                            text: "No PA " + result[0].NoPA + " Berhasil di Generate",
+                            type: "success",
+                        });
+                        DisableAll()
+                        console.log(result);
+                    },
+
+                    error: function (error) {
+                        $("#divloading").attr("hidden", true);
+                        alert(error);
+                    }
+                });
+
+            }
+        }
+        
+    }
+    function Closed() {
+        var dictlist = {
+            Option: 14,
+            Period: $("#ddl_Periode_SPB").val(),
+            KodeSubdist: $("#ddl_SubBayar_SPB").val()
+        }
+        var dto = {
+            Model: dictlist
+        }
+        if ($("#ddl_Periode_SPB").val() == '' ||  $("#ddl_SubBayar_SPB").val() == '') {
+            swal({
+                title: "Errpr!",
+                text: "Periode SPB atau Subdist Bayar harus dipilih terlebih dahulu",
+                type: "error",
+                showConfirmButton: false,
+                timer: 2000,
+            });
+            return
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: "post",
+            dataType: "json",
+            data: JSON.stringify(dto),
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+                var result = JSON.parse(data);
+                swal({
+                    title: "Success!",
+                    text: "Transaction berhasil di Closed",
+                    type: "success",
+                    showConfirmButton: false,
+                    timer: 2000,
+                });
+                DisableAll();
+                console.log(result);
+            },
+
+            error: function (error) {
+                $("#divloading").attr("hidden", true);
+                alert(error);
+            }
+        });
+    }
+    function tanggalpembayaran(tanggalcetak) {
+        var date = new Date(tanggalcetak);
+        date.setDate(date.getDate() + 14);
+        dateFormat(date,"yyyy-MM-dd")
+    }
+    function dateFormat(inputDate, format) {
+        //parse the input date
+        const date = new Date(inputDate);
+
+        //extract the parts of the date
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+
+        //replace the month
+        format = format.replace("MM", month.toString().padStart(2, "0"));
+
+        //replace the year
+        if (format.indexOf("yyyy") > -1) {
+            format = format.replace("yyyy", year.toString());
+        } else if (format.indexOf("yy") > -1) {
+            format = format.replace("yy", year.toString().substr(2, 2));
+        }
+
+        //replace the day
+        format = format.replace("dd", day.toString().padStart(2, "0"));
+
+        $('#Tanggal_Pembayaran_SPB').val(format);
+    }
+</script>
+<style>
+
+    .dataTables_filter {
+        position: relative;
+    }
+
+        .dataTables_filter input {
+            width: 250px;
+            height: 32px;
+            background: #fcfcfc;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            box-shadow: 0 0 3px #ccc, 0 10px 15px #ebebeb inset;
+            text-indent: 10px;
+        }
+
+        .dataTables_filter .fa-search {
+            position: absolute;
+            top: 10px;
+            left: auto;
+            right: 10px;
+        }
+</style>
+
+<div class="containers">
+    <div class="col-md-12">
+        <div id="CardHeaderPA" class="card">
+            <div class="card-body">
+                <h4 class="card-title">Create To PA</h4>
+
+                <hr />
+                <div class="basic-form">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Tipe Pembayaran
+                                </div>
+                                <div class="col-md-8">
+
+                                    <select id="ddl_tipe_bayar" class="form-control">
+                                        <option selected disabled>Silahkan Pilih Tipe Pembayaran</option>
+                                        <option class="dropdown-item" value="TO">TO</option>
+                                        <option class="dropdown-item" value="SPB">SPB</option>
+
+                                        @*<option class="dropdown-item" value="SLA">SLA</option>*@
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" id="div_NoMemo">
+                                <div class="col-md-2">
+                                    No Memo
+                                </div>
+                                <div class="col-md-8">
+
+                                    <select id="ddl_memo" class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row" hidden="hidden">
+                                <div class="col-md-2">
+                                    Subdist Bayar
+                                </div>
+                                <div class="col-md-8">
+
+                                    <select id="ddl_subdist_bayar" class="form-control" title="Silahkan Pilih Subdist Bayar">
+                                    </select>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="CardDetailPA" class="card">
+            <div class="card-body">
+                <h4 class="card-title">Detail PA</h4>
+                <hr />
+                <div class="basic-form">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Tujuan Subdist
+                                </div>
+                                <div class="col-md-8">
+
+                                    <select id="ddl_tujuan_subdist" class="form-control" title="Silahkan Pilih Tujuan Subdist">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Budget Available
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txtBudgetAvailableShow" type="text" class="form-control" placeholder="*** Generate By System ***" readonly="readonly">
+                                    <input id="txtBudgetAvailable" type="text" class="form-control" placeholder="*** Generate By System ***" readonly="readonly" hidden="hidden">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Subdist Bayar
+                                </div>
+                                <div class="col-md-8">
+
+                                    <select id="ddl_tujuan_subdistBayar" class="form-control" title="Silahkan Pilih SubdistBayar">
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="formSaldo" class="form-group row">
+                                <div class="col-md-2">
+                                    Saldo
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txtsaldoPAShow" type="text" class="form-control" placeholder="*** Generate By System ***" readonly="readonly">
+                                    <input id="txtsaldoPA" type="text" class="form-control" placeholder="*** Generate By System ***" readonly="readonly" hidden="hidden">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Nama Bank
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txtBank" type="text" class="form-control" placeholder="Silahkan Isi Nama Bank">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Nama Rekening
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txtNamaRek" type="text" class="form-control" placeholder="Silahkan Isi Nama Rekening">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    No Rekening
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txtNoRek" type="text" class="form-control" placeholder="Silahkan Isi Nomer Rekening">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Note Tambahan
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txtNoteRemarks" type="text" class="form-control" placeholder="Silahkan Isi Note Tambahan">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    List Expense
+                                </div>
+                                <div class="col-md-8">
+
+                                    <select id="ddl_list_expense" class="form-control">
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Nominal Bayar
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txtNominalBayar" type="number" class="form-control" placeholder="Silahkan Isi Nominal Klaim TO">
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    End Budget
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txtEndBudget" type="number" class="form-control" placeholder="*** Generate By System ***" readonly="readonly">
+                                </div>
+                            </div>
+                            <br />
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <button id="btnAddDetail" class="btn btn-dark m-t-20 btn sweet-auto">Add Detail</button>
+                                    <button id="btnCloseSisaBayar" class="btn btn-dark m-t-20">Close Sisa Pembayaran</button>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    No PA
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txtNoPA" type="text" class="form-control" placeholder="*** Generate By System ***" readonly="readonly">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12" style="margin-left:-15px">
+                            <div id="form_tablePA" class="form-group row">
+                                <table id="tblItemList" class="table table-striped table-bordered zero-configuration">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>HeadLN</th>
+                                            <th>ShipToID</th>
+                                            <th>NamaSubdist</th>
+                                            <th>Amount</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tBodyPA">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div id="formBtnCreateClosePA" class="form-group row">
+                                <div class="col-md-12">
+                                    <button id="btnCreatePA" class="btn btn-dark m-t-20" style="margin-right:20px">Create PA</button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <div id="CardSPB" class="card">
+            <div class="card-body">
+                <h4 class="card-title">Detail PA</h4>
+                <hr />
+                <div class="basic-form">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Periode SPB
+                                </div>
+                                <div class="col-md-8">
+
+                                    <select id="ddl_Periode_SPB" class="form-control" title="Silahkan Pilih Periode" style="width:100%;">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Find Subdist Bayar:
+                                </div>
+                                <div class="col-md-4">
+
+                                    <select id="ddl_SubBayar_SPB" class="form-control" title="Silahkan Pilih Tujuan Subdist" disabled>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <input id="txtBudgetSPB" type="text" class="form-control" placeholder="*** Generate By System ***" readonly="readonly">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    <label>Subdist Konfirm Buyer</label>
+                                </div>
+                                <div class="col-md-1">
+                                    <input type="radio" id="Konfirm_Yes" name="SB_Konfirm" value="KONFIRM" disabled>
+                                    <label for="Yes">Ya</label>
+                                </div>
+                                <div class="col-md-1">
+
+                                    <input type="radio" id="Konfirm_No" name="SB_Konfirm" value="NOT KONFIRM" disabled>
+                                    <label for="No">No</label>
+                                </div>
+                                <div class="col-md-1">
+
+                                    <input type="radio" id="Konfirm_EO" name="SB_Konfirm" value="KONFIRM EO" disabled>
+                                    <label for="EO" id="EOLbl">EO</label>
+                                </div>
+                            </div>
+                            <div class="form-group row" id="div_List_EO">
+                                <div class="col-md-2">
+                                 Nama EO
+                                </div>
+                                <div class="col-md-8">
+
+                                    <input id="Txt_Nama_EO" type="text" class="form-control" value="" readonly>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Cabang
+                                </div>
+                                <div class="col-md-8">
+
+                                    <select id="ddl_Cabang_SPB" class="form-control" title="Silahkan Pilih Periode" disabled>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Subdist Buyer
+                                </div>
+                                <div class="col-md-8">
+                                    <select id="ddl_SubBuyer_SPB" class="form-control" title="Silahkan Pilih Periode" disabled>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Budget Available
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txt_BudgetAvail_SPB" type="text" class="form-control" readonly>
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Tanggal Cetak
+                                </div>
+                                <div class="col-md-8">
+
+                                    <input type="date" class="form-control" id="Tanggal_Cetak_SPB" />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Tanggal Pembayaran
+                                </div>
+                                <div class="col-md-8">
+
+                                    <input type="date" class="form-control" id="Tanggal_Pembayaran_SPB" readonly />
+                                </div>
+                            </div>
+
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Expense Item
+                                </div>
+                                <div class="col-md-8">
+                                    <select id="ddl_ExpenseItem_SPB" class="form-control" title="Silahkan Pilih Periode" disabled>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Biaya Tambahan
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="number" id="Biaya_Tambahan_SPB" class="form-control" value="" placeholder="0" />
+                                </div>
+                            </div>
+                            <br />
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Keterangan:
+                                </div>
+                                <div class="col-md-8">
+                                    <textarea id="Ket_Tamb_SPB" class="form-control"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Biaya Pengurangan
+                                </div>
+                                <div class="col-md-8">
+                                    <input type="number" class="form-control" id="Biaya_Pengurangan_SPB" value="" placeholder="0" />
+                                </div>
+                            </div>
+                            <br />
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Keterangan:
+                                </div>
+                                <div class="col-md-8">
+                                    <textarea id="Ket_Kurang_SPB" class="form-control"></textarea>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-2">
+                                    Total Biaya SPB:
+                                </div>
+                                <div class="col-md-8">
+                                    <input id="txtTotBiayaSPB" type="text" class="form-control" placeholder="*** Generate By System ***" readonly="readonly">
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <div class="col-md-6">
+                                    <input type="button" class="btn btn-primary" id="Create_PA_SPB" value="Create to PA">
+
+                                    <input type="button" class="btn btn-primary" id="Close_PA_SPB" value="Close SPB">
+
+                                </div>
+                                @*<div class="col-md-1">
+
+                                        <input type="button" class="btn btn-primary" id="Chck_Val" name="SB_Konfirm" value="Check Value ">
+
+                                    </div>*@
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-12" style="margin-left:-15px">
+                            <div id="form_tableSPB" class="form-group row" hidden>
+                                <table id="tbl_SPB" class="table table-striped table-bordered zero-configuration">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th hidden>ID</th>
+                                            <th>Period</th>
+                                            <th>REG</th>
+                                            <th>Bank</th>
+                                            <th>No KTP</th>
+                                            <th>Nomor Rekening</th>
+                                            <th>Nama Team</th>
+                                            <th>No Surat</th>
+                                            <th>Jumlah</th>
+                                            <th hidden></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tBodyPA">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                    @*<div class="row">
+                            <div class="col-md-12">
+                                <div id="formBtnCreateClosePA" class="form-group row">
+                                    <div class="col-md-12">
+                                        <button id="btnCreatePA" class="btn btn-dark m-t-20" style="margin-right:20px">Create PA</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>*@
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

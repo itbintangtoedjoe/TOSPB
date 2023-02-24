@@ -1,0 +1,363 @@
+﻿
+@{
+    ViewBag.Title = "AddApproval_SPB";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<style>
+
+    .dataTables_filter {
+        position: relative;
+    }
+
+        .dataTables_filter input {
+            width: 250px;
+            height: 32px;
+            background: #fcfcfc;
+            border: 1px solid #aaa;
+            border-radius: 5px;
+            box-shadow: 0 0 3px #ccc, 0 10px 15px #ebebeb inset;
+            text-indent: 10px;
+        }
+
+        .dataTables_filter .fa-search {
+            position: absolute;
+            top: 10px;
+            left: auto;
+            right: 10px;
+        }
+</style>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title">Report Lampiran</h4>
+                    <div class="row form-group-sm">
+                        <div class="col-md-6">
+                            <label class="m-t-20">No Surat SPB<span style="color: red">*</span></label>
+                            <select id="ddl_No_Surat" class="form-control" title="Silahkan Pilih Subdist Bayar">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row form-group-sm">
+                        <div class="col-md-6">
+                            <label class="m-t-20">Nama Pemeriksa<span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="Checker" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="m-t-20">Title Pemeriksa<span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="tlt_Checker" />
+                        </div>
+                    </div>
+
+                    <div class="row form-group-sm">
+                        <div class="col-md-6">
+                            <label class="m-t-20">Nama Penyetuju<span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="Approver" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="m-t-20">Title Penyetuju<span style="color: red">*</span></label>
+                            <input type="text" class="form-control" id="tlt_Approver" />
+                        </div>
+                    </div>
+                    <div class="row form-group-sm mt-3">
+                        <div class="col-md-6">
+                            <button class="btn btn-primary" id="InsertApprover" style="background-color:forestgreen;">Submit</button>
+                        </div>
+                    </div>
+                    @*<div class="table-responsive">
+                        <div class="col-md-12" id="div_tblReport">
+                            <table id="tbl_Lampiran" class="table table-striped table-bordered zero-configuration">
+                                <thead>
+                                    <tr>
+                                        <th>No</th>
+                                        <th>No Surat</th>
+                                        <th>Nama Checker</th>
+                                        <th>Title Checker</th>
+                                        <th>Nama Approver</th>
+                                        <th>Title Approver</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tBodyLampiran">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="Modal_Row" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Update EO</h5>
+            </div>
+            <div class="modal-body">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row form-group-sm">
+                            <div class="col-md-6">
+                                <label class="m-t-20">No Surat<span style="color: red">*</span></label>
+                                <input class="form-control" type="text" id="No_Surat_Mod" />
+                            </div>
+                        </div>
+                        <div class="row form-group-sm">
+                            <div class="col-md-6">
+                                <label class="m-t-20">Nama Checker<span style="color: red">*</span></label>
+                                <input class="form-control" type="text" id="Checker_mod" />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row form-group-sm">
+                            <div class="col-md-6">
+                                <label class="m-t-20">Title Penyetuju<span style="color: red">*</span></label>
+                                <input class="form-control" type="text" id="tlt_checker_mod" />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row form-group-sm">
+                            <div class="col-md-6">
+                                <label class="m-t-20">Nama Approver<span style="color: red">*</span></label>
+                                <input class="form-control" type="text" id="Approver_mod" />
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row form-group-sm">
+                            <div class="col-md-6">
+                                <label class="m-t-20">Title Approver<span style="color: red">*</span></label>
+                                <input class="form-control" type="text" id="tlt_Approver_mod" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="Cancel">Cancel</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" id="btn_Update">Update</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link href="~/Content/plugins/sweetalert2/dist/sweetalert2.min.css" rel="stylesheet" />
+<script src="~/Content/plugins/sweetalert2/dist/sweetalert2.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        //GetLampiran();
+        GetNoSurat();
+        $('#InsertApprover').click(function () {
+            InsertApprover();
+        })
+        $("#ddl_No_Surat").change(function () {
+            GetLampiran();
+        })
+        $('#tbl_Lampiran tbody').on('click', 'input[id="Updatebtn"]', function () {
+            var row = $(this).closest("TR");
+            var table = $('#tbl_EO').DataTable();
+            var tblrow = table.row(row).data();
+            $('#No_Surat_Mod').val(tblrow["NoSurat"]);
+            $('#Checker_mod').val(tblrow["Nama_Checker"]);
+            $('#tlt_checker_mod').val(tblrow["Joblvl_Checker"]);
+            $('#Approver_mod').val(tblrow["Nama_Approver"]);
+            $('#tlt_Approver_mod').val(tblrow["Joblvl_Approver"]);
+        })
+        //$('#tbl_Lampiran tbody').on('click', 'input[id="btn_View"]', function () {
+            
+        //})
+        //$('#btn_Update').click(function () {
+        //    var dictlist = {
+        //        Option: 25,
+        //        NOMSurat: $('#No_Surat_Mod').val(),
+        //        Nama_Checker: $('#Checker_mod').val(),
+        //        Job_Checker: $('#tlt_checker_mod').val(),
+        //        Nama_Approver: $('#Approver_mod').val(),
+        //        Job_Approver: $('#tlt_Approver_mod').val(),
+        //    }
+
+        //    var dto = {
+        //        Model: dictlist
+        //    }
+        //    $.ajax({
+        //        url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+        //        type: "POST",
+        //        dataType: "json",
+        //        data: JSON.stringify(dto),
+        //        contentType: "application/json;charset=utf-8",
+        //        success: function (data) {
+        //            var result = JSON.parse(data);
+        //            swal({
+        //                title: "Success!",
+        //                text: "No Surat berhasil di update!",
+        //                type: "success",
+        //                showConfirmButton: false,
+        //                timer: 2000,
+        //            });
+        //            GetLampiran();
+
+
+        //        }, error: function (ex) {
+        //            console.log(JSON.stringify(ex))
+        //        }
+        //    });
+        //})
+    });
+
+    function InsertApprover() {
+        var dictlist = {
+            NOMSurat: $('#ddl_No_Surat').val(),
+            Nama_Checker: $('#Checker').val().trim(),
+            Job_Checker: $('#tlt_Checker').val().trim(),
+            Nama_Approver: $('#Approver').val().trim(),
+            Job_Approver: $('#tlt_Approver').val().trim(),
+            Option: 21
+        }
+        var checklist = {
+            No_Surat: $('#ddl_No_Surat').val(),
+            Nama_Checker: $('#Checker').val().trim(),
+            TitleChecker: $('#tlt_Checker').val().trim(),
+            Nama_Approver: $('#Approver').val().trim(),
+            Title_Approver: $('#tlt_Approver').val().trim(),
+            Option: 21
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+
+        $.each(checklist, function (key, value) {
+
+            if (value == '' || value == null) {
+                if (key.indexOf("_") > 0) {
+                    var keysplit = key.split('_');
+                    Swal.fire({
+                        title: "Warning!",
+                        text: "Silahakan melengkapi " + keysplit[0] + " " + keysplit[1] + " yang kosong terlebih dahulu",
+                        type: "warning",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                    return valid = false;
+                }
+                else {
+                    Swal.fire({
+                        title: "Warning!",
+                        text: "Silahakan melengkapi " + key + " yang kosong terlebih dahulu",
+                        type: "warning",
+                        showConfirmButton: false,
+                        timer: 2000,
+                    });
+                    return valid = false;
+                }
+            }
+            else {
+                valid = true;
+            }
+        })
+
+        if (valid == true) {
+            $.ajax({
+                url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+                type: "post",
+                dataType: "json",
+                data: JSON.stringify(dto1),
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    var result = JSON.parse(data);
+                    if (result[0].Stat == 'Update') {
+                        Swal.fire({
+                            title: 'Lampiran berhasil di Update',
+                            type: "success",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        }).then(() => {
+                            window.open("../Report_SPB_View/Report_Lampiran_SPB?No_Surat=" + $('#ddl_No_Surat').val() + "");
+                        });
+                    }
+                    else {
+                        Swal.fire({
+                            title: 'Lampiran berhasil di Submit',
+                            type: "success",
+                            showConfirmButton: false,
+                            timer: 2000,
+                        }).then(() => {
+                            window.open("../Report_SPB_View/Report_Lampiran_SPB?No_Surat=" + $('#ddl_No_Surat').val() + "");
+                        });
+                    }
+                },
+                error: function (errormessage) {
+                }
+            });
+        }
+        
+    }
+    function GetNoSurat() {
+        var dictlist = {
+            Period: $("#ddl_Periode").val(),
+            Option: 22
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: 'post',
+            dataType: 'json',
+            data: JSON.stringify(dto1),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                var result = JSON.parse(data);
+                console.log(data);
+                var count = result.length;
+                var trhtml = '';
+                var trav = 0;
+
+                trhtml += '<option disabled selected hidden class="dropdown-header">*** Pilih Nomer Memo ***</option>';
+                if (count > 0) {
+                    for (trav = 0; trav < count; trav++) {
+                        trhtml += '<Option class="dropdown-item" value = "' + result[trav].NOSURAT + '" > ' + result[trav].NOSURAT;
+                    }
+                }
+                $("#ddl_No_Surat").empty();
+                $("#ddl_No_Surat").append(trhtml);
+                $("#ddl_No_Surat").select2();
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+    function GetLampiran() {
+        var dictlist = {
+            Option: 24,
+            NOMSurat: $("#ddl_No_Surat").val()
+        }
+        var dto1 = {
+            Model: dictlist
+        }
+        $.ajax({
+            url: "../UploadMemo/DynamicController?spname=SP_PA_SPB",
+            type: 'post',
+            dataType: 'json',
+            data: JSON.stringify(dto1),
+            contentType: 'application/json; charset=utf-8',
+            success: function (data) {
+                var result = JSON.parse(data);
+                var len = result.length;
+                if (len > 0) {
+                    $('#Checker').val(result[0].Nama_Checker)
+                    $('#tlt_Checker').val(result[0].Joblvl_Checker)
+                    $('#Approver').val(result[0].Nama_Approver)
+                    $('#tlt_Approver').val(result[0].Joblvl_Approver)
+                }
+            }, error: function (ex) {
+                alert(JSON.stringify(ex));
+            }
+        });
+    }
+</script>
